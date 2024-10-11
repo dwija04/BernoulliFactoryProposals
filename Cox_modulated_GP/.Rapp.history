@@ -1,0 +1,3 @@
+load("/Users/dwijakakkad/Desktop/MCMC/Bernoulli factory proposals/Cox_modulated_GP/cox-data.RData")
+load("/Users/dwijakakkad/Desktop/MCMC/Bernoulli factory proposals/Cox_modulated_GP/output_cox_single_run.RData")
+load("/Users/dwijakakkad/Desktop/MCMC/Bernoulli factory proposals/Cox_modulated_GP/output_cox_single_run.RData")

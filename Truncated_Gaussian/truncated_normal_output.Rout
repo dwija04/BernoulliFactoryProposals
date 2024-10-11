@@ -1,0 +1,118 @@
+
+R version 4.3.2 (2023-10-31) -- "Eye Holes"
+Copyright (C) 2023 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> load("output_trunc_gaussian.RData")
+> 
+> ##########################################
+> # Replications output
+> ##########################################
+> #Extracting the output
+> reps <- length(output_trunc_gaussian)
+> 
+> bf_time <- numeric(reps)
+> mh_time <- numeric(reps)
+> bf_loops_mean <- numeric(reps)
+> bf_loops_max <- numeric(reps)
+> bf_ess <- numeric(reps)
+> mh_ess <- numeric(reps)
+> 
+> for(i in 1:reps)
++ {
++   bf_time[i] <- output_trunc_gaussian[[i]][[1]][[3]]
++   mh_time[i] <- output_trunc_gaussian[[i]][[2]][[3]]
++   bf_loops_mean[i] <- output_trunc_gaussian[[i]][[3]]
++   bf_loops_max[i] <- output_trunc_gaussian[[i]][[4]]
++   bf_ess[i] <- output_trunc_gaussian[[i]][[5]]
++   mh_ess[i] <- output_trunc_gaussian[[i]][[6]]
++ }
+> 
+> #Loops
+> avg_bf_loops_mean <- round(mean(bf_loops_mean), 2)
+> avg_bf_loops_max <- round(mean(bf_loops_max), 2)
+> 
+> bernoulli_df <- data.frame(
++   Metric = c("Average Loops", "Maximum Loops"),
++   Bernoulli_factory = c(avg_bf_loops_mean, avg_bf_loops_max)
++ )
+> print(bernoulli_df)
+         Metric Bernoulli_factory
+1 Average Loops              1.33
+2 Maximum Loops             16.00
+> 
+> #Effective Sample Size
+> 
+> avg_bf_ess <- round(mean(bf_ess))
+> avg_mh_ess <- round(mean(mh_ess))
+> 
+> avg_bf_ess_time <- round(mean(bf_ess/bf_time))
+> avg_mh_ess_time <- round(mean(mh_ess/mh_time))
+> 
+> ess_df <- data.frame(
++   Metric = c("Effective Sample Size (ESS)", "ESS per unit time", "Average computing time"),
++   Exact_proposal = c(avg_bf_ess, avg_bf_ess_time, round(mean(bf_time), 2)),
++   Approximate_proposal = c(avg_mh_ess, avg_mh_ess_time, round(mean(mh_time), 2))
++ )
+> print(ess_df)
+                       Metric Exact_proposal Approximate_proposal
+1 Effective Sample Size (ESS)      120682.00            160222.00
+2           ESS per unit time        4221.00              6353.00
+3      Average computing time          30.64                27.63
+> 
+> #Average computing times
+> print(mean(round(bf_time, 2)))
+[1] 30.6438
+> print(mean(round(mh_time, 2)))
+[1] 27.631
+> ##########################################
+> ## Single chain plots
+> ##########################################
+> load("output_trunc_gaussian_single_run.RData")
+> #Density Plots
+> 
+> 
+> pdf("plots/trunc_gauss_density.pdf")
+> x <- seq(0, 15, 0.01)
+> plot(density(bf_chain[[1]]), ylim = c(0, .4), col = "blue", main = " ", xlab = "x")
+> lines(density(mh_chain[[1]]), col = "red")
+> lines(x, dgamma(x, shape = 2, rate = 1), col = "black")
+> legend("topright", legend = c("Target density", "Bernoulli factory MCMC", "Approximate Metropolis-Hastings") ,
++   col = c("black","blue","red"), lty = c(1, 1, 1), cex = 1.2, bty = "n")
+> dev.off()
+null device 
+          1 
+> 
+> pdf("plots/trunc_gauss_acf.pdf")
+> lag.max <- 40
+> mh_acf <- acf(mh_chain[[1]], lag.max = lag.max , plot = FALSE)$acf
+> bf_acf <- acf(bf_chain[[1]], lag.max = lag.max , plot = FALSE)$acf
+> plot(0:lag.max , mh_acf, type = 'l', col = "red",
++   ylab = "Estimated Autocorrelation Function", xlab = "Lags")
+> lines(0:lag.max , bf_acf, col = "blue")
+> legend("topright", legend = c("Bernoulli factory MCMC", "Approximate Metropolis-Hastings") ,
++   col = c("blue","red"), lty = c(1, 1, 1),
++   cex = 1.2, bty = "n")
+> dev.off()
+null device 
+          1 
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.232   0.026   0.265 

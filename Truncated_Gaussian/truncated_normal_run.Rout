@@ -1,0 +1,160 @@
+
+R version 4.4.0 (2024-04-24) -- "Puppy Cup"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> source("truncated_normal_functions.R")
+> library(doParallel)
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: parallel
+> library(foreach)
+> library(mcmcse)
+> set.seed(1)
+> 
+> m <- 1e6 #Length of chain
+> 
+> output_trunc_gaussian <- list()
+> num_cores <- 50
+> doParallel::registerDoParallel(cores = num_cores)
+> reps <- 100
+> 
+> 
+> output_trunc_gaussian <- foreach(b = 1:reps) %dopar% {
++   print(b)
++   bf_time <- system.time(bf <- BF_trunc_norm(n = m, var = 30, init = 1))
++   mh_time <- system.time(mh <- MH_truncnorm(n = m, var = 17, init = 1))
++   bf_chain <- bf[[1]]
++   mh_chain <- mh[[1]]
++   
++   bf_loops_avg <- mean(bf[[2]])
++   bf_loops_max <- max(bf[[2]])
++   bf_ess <- ess(bf_chain)
++   
++   mh_ess <- ess(mh_chain)
++   
++   list(bf_time, mh_time, bf_loops_avg, bf_loops_max, bf_ess, mh_ess)
++ }
+[1] 1
+[1] 2
+[1] 3
+[1] 4
+[1] 5
+[1] 6
+[1] 7
+[1] 8
+[1] 9
+[1] 10
+[1] 11
+[1] 12
+[1] 13
+[1] 14
+[1] 15
+[1] 16
+[1] 17
+[1] 18
+[1] 19
+[1] 20
+[1] 21
+[1] 22
+[1] 23
+[1] 24
+[1] 25
+[1] 26
+[1] 27
+[1] 28
+[1] 29
+[1] 30
+[1] 31
+[1] 32
+[1] 33
+[1] 34
+[1] 35
+[1] 36
+[1] 37
+[1] 38
+[1] 39
+[1] 40
+[1] 41
+[1] 42
+[1] 43
+[1] 44
+[1] 45
+[1] 46
+[1] 47
+[1] 48
+[1] 49
+[1] 50
+[1] 54
+[1] 82
+[1] 59
+[1] 51
+[1] 60
+[1] 64
+[1] 75
+[1] 57
+[1] 67
+[1] 56
+[1] 73
+[1] 52
+[1] 63
+[1] 99
+[1] 98
+[1] 71
+[1] 62
+[1] 77
+[1] 55
+[1] 85
+[1] 58
+[1] 61
+[1] 91
+[1] 53
+[1] 72
+[1] 66
+[1] 65
+[1] 68
+[1] 79
+[1] 76
+[1] 81
+[1] 96
+[1] 97
+[1] 74
+[1] 93
+[1] 83
+[1] 87
+[1] 92
+[1] 70
+[1] 95
+[1] 78
+[1] 100
+[1] 80
+[1] 69
+[1] 86
+[1] 88
+[1] 94
+[1] 84
+[1] 90
+[1] 89
+> 
+> save(output_trunc_gaussian, file = "output_trunc_gaussian.RData")
+> 
+> 
+> 
+> 
+> proc.time()
+    user   system  elapsed 
+5861.537    8.648  140.255 
