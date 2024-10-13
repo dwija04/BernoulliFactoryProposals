@@ -60,7 +60,7 @@ load("output_trunc_gaussian_single_run.RData")
 
 pdf("plots/trunc_gauss_density.pdf")
 x <- seq(0, 15, 0.01)
-plot(density(bf_chain[[1]]), ylim = c(0, .4), col = "blue", main = " ", xlab = "x")
+plot(density(bf_chain[[1]]), ylim = c(0, .4), col = "blue", main = " ", xlab = "x", ylab = "Estimated Density")
 lines(density(mh_chain[[1]]), col = "red")
 lines(x, dgamma(x, shape = 2, rate = 1), col = "black")
 legend("topright", legend = c("Target density", "Bernoulli factory MCMC", "Approximate Metropolis-Hastings") ,
