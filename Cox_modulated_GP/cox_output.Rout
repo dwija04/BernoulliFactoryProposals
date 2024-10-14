@@ -253,11 +253,11 @@ package ‘TruncatedNormal’ was built under R version 4.3.3
 > j <- 100
 > plot(density(bf_samps[-c(1:1000), j]), col = "blue", ylab = "Estimated Density", xlab = "x", main = "")
 > lines(density(mh_samps[-c(1:1000), j]), col = "red")
-> legend("topright", legend = c("Bernoulli factory", "Metropolis-Hastings"), col = c("blue", "red"), cex = 1.5, lty = 1, lwd = 2, bty = "n")
+> legend("topright", legend = c("Bernoulli factory", "Metropolis-Hastings"), col = c("blue", "red"), cex = 1.2, lty = 1, lwd = 2, bty = "n")
 > dev.off()
 null device 
           1 
 > 
 > proc.time()
    user  system elapsed 
-  1.762   0.150   2.049 
+  1.768   0.170   2.019 

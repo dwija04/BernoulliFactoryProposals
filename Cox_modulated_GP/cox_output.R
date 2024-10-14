@@ -126,5 +126,5 @@ pdf("plots/cox-component-density.pdf")
 j <- 100
 plot(density(bf_samps[-c(1:1000), j]), col = "blue", ylab = "Estimated Density", xlab = "x", main = "")
 lines(density(mh_samps[-c(1:1000), j]), col = "red")
-legend("topright", legend = c("Bernoulli factory", "Metropolis-Hastings"), col = c("blue", "red"), cex = 1.5, lty = 1, lwd = 2, bty = "n")
+legend("topright", legend = c("Bernoulli factory", "Metropolis-Hastings"), col = c("blue", "red"), cex = 1.2, lty = 1, lwd = 2, bty = "n")
 dev.off()

@@ -186,10 +186,10 @@ Type 'q()' to quit R.
 > 
 > pdf("plots/sensor_bernoulli.pdf")
 > par(mfrow = c(2, 2))
-> plot(sensor_1.bern[, 1], sensor_1.bern[, 2], xlab = "x", ylab = "y", main = "Sensor 1")
-> plot(sensor_2.bern[, 1], sensor_2.bern[, 2], xlab = "x", ylab = "y", main = "Sensor 2")
-> plot(sensor_3.bern[, 1], sensor_3.bern[, 2], xlab = "x", ylab = "y", main = "Sensor 3")
-> plot(sensor_4.bern[, 1], sensor_4.bern[, 2], xlab = "x", ylab = "y", main = "Sensor 4")
+> plot(sensor_1.bern[, 1], sensor_1.bern[, 2], xlab = "x_11", ylab = "x_12", main = "Sensor 1")
+> plot(sensor_2.bern[, 1], sensor_2.bern[, 2], xlab = "x_21", ylab = "x_22", main = "Sensor 2")
+> plot(sensor_3.bern[, 1], sensor_3.bern[, 2], xlab = "x_31", ylab = "x_32", main = "Sensor 3")
+> plot(sensor_4.bern[, 1], sensor_4.bern[, 2], xlab = "x_41", ylab = "x_42", main = "Sensor 4")
 > dev.off()
 null device 
           1 
@@ -201,10 +201,10 @@ null device
 > 
 > pdf("plots/sensor_aux.pdf")
 > par(mfrow = c(2, 2))
-> plot(sensor_1.aux[, 1], sensor_1.aux[, 2], xlab = "x", ylab = "y", main = "Sensor 1")
-> plot(sensor_2.aux[, 1], sensor_2.aux[, 2], xlab = "x", ylab = "y", main = "Sensor 2")
-> plot(sensor_3.aux[, 1], sensor_3.aux[, 2], xlab = "x", ylab = "y", main = "Sensor 3")
-> plot(sensor_4.aux[, 1], sensor_4.aux[, 2], xlab = "x", ylab = "y", main = "Sensor 4")
+> plot(sensor_1.aux[, 1], sensor_1.aux[, 2], xlab = "x_11", ylab = "x_12", main = "Sensor 1")
+> plot(sensor_2.aux[, 1], sensor_2.aux[, 2], xlab = "x_21", ylab = "x_22", main = "Sensor 2")
+> plot(sensor_3.aux[, 1], sensor_3.aux[, 2], xlab = "x_31", ylab = "x_32", main = "Sensor 3")
+> plot(sensor_4.aux[, 1], sensor_4.aux[, 2], xlab = "x_41", ylab = "x_42", main = "Sensor 4")
 > dev.off()
 null device 
           1 
@@ -218,4 +218,4 @@ null device
 > 
 > proc.time()
    user  system elapsed 
-  1.240   0.056   1.304 
+  1.229   0.058   1.307 
