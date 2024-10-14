@@ -86,45 +86,17 @@ mh_samps <- mh_chain[[1]]
 #log posterior
 log_post_bf <- bf_chain[[4]]
 log_post_mh <- mh_chain[[3]]
-#Estimated density using exact proposal
-# for(k in 1:length(grid))
-# {
-#   track <- 0
-#   for(i in 1:N)
-#   {
-#     track <- track + smooth(delta_m, t, bf_samps[i, ], grid[k])
-#   }
-#   est_fun1[k] <- track/N
-# }
-# 
-# #Estimated density using approximate proposal
-# for(k in 1:length(grid))
-# {
-#   track <- 0
-#   for(i in 1:N)
-#   {
-#     track <- track + smooth(delta_m, t, mh_samps[i, ], grid[k])
-#   }
-#   est_fun2[k] <- track/N
-# }
+
 
 #True density
 temp <- seq(0, 50, length = 1e4)
 y_temp <- (lam1(temp))
 
 
-# pdf("plots/cox-est-density.pdf")
-# plot(grid, est_fun1, type = 'l', col = "blue", xlim = c(0, 50), ylim = c(0, 3), ylab = "Density", xlab = "Grid")
-# lines(grid, est_fun2, type = 'l', col = "orange")
-# lines(temp, y_temp, lwd = '1.5', col = "black")
-# points(x = unlist(xs, use.names = FALSE), y = rep(0, sum(ns)), pch = 16)
-# legend("topright", legend = c("Truth", "Bernoulli factory", "Approximate Metropolis-Hastings"),
-#      col = c("black", "blue", "orange"), cex = 1.5, lty = 1, lwd = 1.5, bty = "n")
-# dev.off()
 
 pdf("plots/cox-component-density.pdf")
 j <- 100
 plot(density(bf_samps[-c(1:1000), j]), col = "blue", ylab = "Estimated Density", xlab = "x", main = "")
 lines(density(mh_samps[-c(1:1000), j]), col = "red")
-legend("topright", legend = c("Bernoulli factory", "Metropolis-Hastings"), col = c("blue", "red"), cex = 1.2, lty = 1, lwd = 2, bty = "n")
+legend("topright", legend = c("Bernoulli factory MCMC", "Inexact Metropolis-Hastings"), col = c("blue", "red"), cex = 1.2, lty = 1, lwd = 2, bty = "n")
 dev.off()
