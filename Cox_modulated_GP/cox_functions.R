@@ -17,6 +17,7 @@ phi <- function(del, x, t)
 
 target <- function(chi, x, c, t, cov, n)
 {
+  if(prod(chi > 0) == 0) return(-Inf)
   n0 <- length(n)
   mat <- -0.5 %*% t(chi)%*%inv.cov%*%chi - n0*t(c)%*%chi
   ret <- mat
@@ -153,6 +154,42 @@ cox_mh <- function(N, init, ns, x, c, t, cov, eta)
       log.post[i] <- denom
     }
     if( chi[i, 1] == y[1] ) accept_rate <- accept_rate + 1
+  }
+  accept_rate <- accept_rate/N
+  return(list(chi, accept_rate, log.post))
+}
+
+cox_rwmh <- function(N, init, ns, x, c, t, cov, eta)
+{
+  p <- length(init)
+  chi <- matrix(0, N, p)
+  log.post <- numeric(length = N)
+  chi[1,] <- init
+  accept_rate <- 0
+  log.post[1] <- target(chi[1, ], x, c, t, cov, ns)
+  
+  for(i in 2:N)
+  {
+    if(i%%(N/10) == 0) print(i)
+    
+    z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
+    
+    #Acceptance ratio
+    num <- target(z, x, c, t, cov, ns) 
+    denom <- target(chi[i-1, ], x, c, t, cov, ns)
+    ratio <- exp(num - denom)
+    
+    if(runif(1) < min(1, ratio))
+    {
+      chi[i, ] <- z
+      log.post[i] <- num
+    }
+    else
+    {
+      chi[i, ] <- chi[i-1, ]
+      log.post[i] <- denom
+    }
+    if( chi[i, 1] == z[1] ) accept_rate <- accept_rate + 1
   }
   accept_rate <- accept_rate/N
   return(list(chi, accept_rate, log.post))

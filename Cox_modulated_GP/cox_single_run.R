@@ -1,7 +1,8 @@
 set.seed(1)
-source("cox_functions.R")
+# source("cox_functions.R")
 load("estimated-cov.RData")
 load("cox-data.RData")
+Rcpp::sourceCpp("cox_functions.cpp")
 
 ns <- xn[[1]]
 x <- xn[[2]]
@@ -31,6 +32,10 @@ eta_mh <- 0.005
 mh_chain <- cox_mh(N, init = rep(1, m), ns = ns, x, c, t, cov, eta_mh)
 mh_chain[[2]]
 
-save(bf_chain, mh_chain, file = "output_cox_single_run.RData")
+eta_rwmh <- 0.0007
+rwmh_chain <- cox_rwmh(N, init = rep(1.5, m), ns = ns, x, c, t, cov, eta_rwmh)
+rwmh_chain[[2]]
+
+save(bf_chain, mh_chain, rwmh_chain, file = "output_cox_single_run.RData")
 
 

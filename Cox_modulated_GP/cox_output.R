@@ -2,6 +2,7 @@
 ## Code for reproducing the results from
 ## the Cox processes example
 ##########################################
+library(mcmcse)
 load("cox-data.RData")
 load("output_Cox.RData")
 
@@ -75,17 +76,38 @@ print(ESS_df)
 
 source("cox_functions.R")
 load("output_cox_single_run.RData")
+
 #PLOTS
 delta_m <- 50/(m-1)
 grid <- seq(0, 50, length = 100)
 est_fun1 <- numeric(length = length(grid))
 est_fun2 <- numeric(length = length(grid))
+
 bf_samps <- bf_chain[[1]]
 mh_samps <- mh_chain[[1]]
+rwmh_samps <- rwmh_chain[[1]]
+
+# ESS_bf <- min(ess(bf_samps))
+# ESS_mh <- ess(mh_samps)
+# ESS_rwmh <- min(ess(rwmh_samps))
+# 
+# mESS_bf <- multiESS(bf_samps)
+# mESS_mh <- multiESS(mh_samps)
+# mESS_rwmh <- multiESS(rwmh_samps)
+# 
+# time_bf <- bf_time[3]
+# time_mh <- mh_time[3]
+# time_rwmh <- rwmh_time[3]
+# 
+# ess_per_time_bf <- ESS_bf/time_bf
+# ess_per_time_mh <- ESS_mh/time_mh
+# ess_per_time_rwmh <- ESS_rwmh/time_rwmh
+
 
 #log posterior
 log_post_bf <- bf_chain[[4]]
 log_post_mh <- mh_chain[[3]]
+log_post_rwmh <- rwmh_chain[[3]]
 
 
 #True density
@@ -98,5 +120,6 @@ pdf("plots/cox-component-density.pdf")
 j <- 100
 plot(density(bf_samps[-c(1:1000), j]), col = "blue", ylab = "Estimated Density", xlab = "x", main = "")
 lines(density(mh_samps[-c(1:1000), j]), col = "red")
-legend("topright", legend = c("Bernoulli factory MCMC", "Inexact Metropolis-Hastings"), col = c("blue", "red"), cex = 1.2, lty = 1, lwd = 2, bty = "n")
+lines(density(rwmh_samps[-c(1:1000), j]), col = "green")
+legend("topright", legend = c("Bernoulli factory MCMC", "Inexact Metropolis-Hastings", "RWMH"), col = c("blue", "red", "green"), cex = 1.2, lty = 1, lwd = 2, bty = "n")
 dev.off()
