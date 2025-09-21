@@ -22,14 +22,14 @@ max(cov - sqrt.cov %*% sqrt.cov)
 inv.cov <- qr.solve(cov)
 
 #Running MCMC using exact proposal
-N <- 1e4
+N <- 1e6
 
 eta_bf <- 0.004 #step size
 bf_time <- system.time(bf_chain <- cox_bf(N, init = rep(1,  m), ns = ns, x, c, t, cov, eta_bf))
 bf_chain[[3]]
 
 eta_bf <- 0.004 #step size
-bf_time_new <- system.time(bf_chain_new <- cox_bf(N, init = rep(1,  m), ns = ns, x, c, t, cov, eta_bf))
+bf_time_new <- system.time(bf_chain_new <- cox_bf_newbounds(N, init = rep(1,  m), ns = ns, x, c, t, cov, eta_bf))
 bf_chain_new[[3]]
 
 # eta_mh <- 0.005

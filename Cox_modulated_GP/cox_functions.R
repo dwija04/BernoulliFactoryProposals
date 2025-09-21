@@ -229,8 +229,8 @@ cox_bf_newbounds <- function(N, init, ns, x, c, t, cov, eta)
     #Bernoulli factory
     bx <- min(pnorm(chi[i-1, ]/sqrt(diag(cov))))
     by <- min(pnorm(y/sqrt(diag(cov))))
-    c1 <- target(y, x, c, t, cov, ns)*bx
-    c2 <- target(chi[i-1, ], x, c, t, cov, ns)*by
+    c1 <- target(y, x, c, t, cov, ns) + log(bx)
+    c2 <- target(chi[i-1, ], x, c, t, cov, ns) + log(by)
     C <- exp(c1 - c2)/(1 + exp(c1 - c2))
     bern_loops <- 0
     accept <- FALSE
@@ -244,7 +244,7 @@ cox_bf_newbounds <- function(N, init, ns, x, c, t, cov, eta)
       if(C1 == 1) 
       {
         m1 <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
-        if(is_positive(m1)) p_x <- 1/bx
+        if(is_positive(m1)) p_x <- bx
         else p_x <- 0
         C2 <- rbinom(1, 1, p_x)
         if(C2 == 1) 
@@ -257,7 +257,7 @@ cox_bf_newbounds <- function(N, init, ns, x, c, t, cov, eta)
       else 
       {
         m2 <- y + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
-        if(is_positive(m2)) p_y <- 1/by
+        if(is_positive(m2)) p_y <- by
         else p_y <- 0
         C2 <- rbinom(1, 1, p_y)
         if(C2 == 1) 
