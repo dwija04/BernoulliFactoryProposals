@@ -1,7 +1,8 @@
 set.seed(1)
 source("cox_functions.R")
 load("estimated-cov.RData")
-load("cox-data.RData")
+# load("cox-data.RData")
+load("cox-data-200.RData")
 library(foreach) 
 library(doParallel)
 library(mcmcse)
@@ -63,5 +64,5 @@ output_cox <- foreach(b = 1:reps) %dopar% {
 }
 
 
-save(output_cox, file = "output_Cox.RData")
+save(output_cox, file = "output_Cox-200.RData")
 

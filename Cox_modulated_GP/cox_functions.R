@@ -2,6 +2,7 @@
 # library("lineqGPR")
 library(MASS)
 library(TruncatedNormal)
+Rcpp::sourceCpp("cox_proposal_bf.cpp")
 
 lam1 <- function(x)
 {
@@ -41,7 +42,8 @@ is_positive <- function(x)
   return(1)
 }
 
-#Running MCMC using exact proposal
+
+# Running MCMC using exact proposal
 cox_bf <- function(N, init, ns, x, c, t, cov, eta)
 {
   p <- length(init)
@@ -51,51 +53,57 @@ cox_bf <- function(N, init, ns, x, c, t, cov, eta)
   accept_rate <- 0
   log.post[1] <- target(chi[1, ], x, c, t, cov, n = ns)
   bernoulli_loops <- numeric(N)
+  L <- chol(cov)
+  
   for(i in 2:N)
   {
     accept <- 0
     if(i%%(N/10) == 0) print(i)
+
     
-    #Accept-Reject step
-    while(!accept)
-    {
-      z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
-      if(is_positive(z)) 
-      {
-        y <- z
-        accept <- 1
-      }
-    }
+    # while(!accept)
+    # {
+    #   z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
+    #   if(is_positive(z))
+    #   {
+    #     y <- z
+    #     accept <- 1
+    #   }
+    # }
+
+    y <- propose_step(chi[i-1, ], L, eta)
+    
+
     #Bernoulli factory
     c1 <- target(y, x, c, t, cov, ns)
     c2 <- target(chi[i-1, ], x, c, t, cov, ns)
     C <- exp(c1 - c2)/(1 + exp(c1 - c2))
     bern_loops <- 0
     accept <- FALSE
-    while(!accept) 
+    while(!accept)
     {
       bern_loops <- bern_loops + 1
       C1 <- rbinom(1, 1, C)
-      if(C1 == 1) 
+      if(C1 == 1)
       {
         m1 <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
         if(is_positive(m1)) p_x <- 1
         else p_x <- 0
         C2 <- rbinom(1, 1, p_x)
-        if(C2 == 1) 
+        if(C2 == 1)
         {
           chi[i, ] <- y
           log.post[i] <- c1
           accept <- TRUE
         }
-      } 
-      else 
+      }
+      else
       {
         m2 <- y + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
         if(is_positive(m2)) p_y <- 1
         else p_y <- 0
         C2 <- rbinom(1, 1, p_y)
-        if(C2 == 1) 
+        if(C2 == 1)
         {
           chi[i, ] <- chi[i-1, ]
           log.post[i] <- c2
@@ -125,17 +133,16 @@ cox_mh <- function(N, init, ns, x, c, t, cov, eta)
   {
     accept <- 0
     if(i%%(N/10) == 0) print(i)
-    
-    #Accept-Reject step
     while(!accept)
     {
       z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
-      if(is_positive(z)) 
+      if(is_positive(z))
       {
         y <- z
         accept <- 1
       }
     }
+    
     #Acceptance ratio
     num <- target(y, x, c, t, cov, ns) 
     denom <- target(chi[i-1, ], x, c, t, cov, ns)

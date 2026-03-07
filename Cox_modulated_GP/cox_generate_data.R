@@ -29,7 +29,8 @@ for(j in 1:N0)
 }
 
 #Linear interpolation
-m <- 100
+# m <- 100
+m <- 500
 delta_m <- 50/(m-1) #the support is [0, 50]
 t <- numeric(m)
 c <- numeric(m)
@@ -62,4 +63,5 @@ cov[1,m]
 cov <- cov
 
 xn <- list(ns, x, c, t, cov, m, delta_m, N0, mu)
-save(xn, file = "cox-data.RData")
+save(xn, file = "cox-data-high-dim.RData")
+# save(xn, file = "cox-data.RData")

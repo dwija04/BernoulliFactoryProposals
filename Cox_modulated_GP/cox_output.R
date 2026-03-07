@@ -13,7 +13,7 @@ m <- xn[[6]] #number of observations
 t <- xn[[4]] #grid
 
 
-N <- 1e6
+N <- 1e4
 reps <- length(output_cox)
 
 
@@ -127,9 +127,7 @@ print(paste("Min ESS RWMH: ", ess_rwmh))
 
 ess_per_time_bf_new <- ess_bf_new/time_bf_new
 ess_per_time_bf <- ess_bf/time_bf
-ess_per_time_rwmh <- ess_rwmh/time_rwmh
-
-
+ess_per_time_rwmh <- ess_rwmh/time_rwmh o
 
 print(paste("ESS per unit time BF new bounds: ", round(ess_per_time_bf_new, 4)))
 print(paste("ESS per unit time BF old bounds: ", round(ess_per_time_bf, 4)))
@@ -151,7 +149,7 @@ y_temp <- (lam1(temp))
 
 
 pdf("plots/cox-component-density.pdf")
-j <- 100
+j <- 10
 plot(density(bf_samps[-c(1:1000), j]), col = "blue", ylab = "Estimated Density", xlab = "x", main = "", lwd = 2)
 # lines(density(mh_samps[-c(1:1000), j]), col = "red")
 lines(density(rwmh_samps[-c(1:1000), j]), col = "green")

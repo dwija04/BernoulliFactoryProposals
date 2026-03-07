@@ -1,0 +1,64 @@
+WARNING: unknown option '--v'
+
+
+R version 4.4.0 (2024-04-24) -- "Puppy Cup"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Previously saved workspace restored]
+
+> f <- function(y) dnorm(y, 0, 1) # True density
+> 
+> L <- function(y, nu)
++ {
++   return(dnorm(y, 0, 1) / dt(y, df = nu))
++ }
+> 
+> 
+> f.dprime <- function(y) #Second derivative of f
++ {
++   return(dnorm(y, 0, 1)*(y^2 - 1))
++ }
+> 
+> k_h <- function(z, h) (dnorm(z/h, mean = 0, sd = 1)/h) #kernel
+> 
+> generate_samples <- function(nu, m) (rt(m, df = nu)) #generate samples
+> 
+> var_kde <- function(y, nu, X, n, eta_k = 1, rho_k = 1/(2*(3.141593)) )
++ {
++ 
++   h_opt <- numeric(3)
++   h_opt[1] <- (n/100)^(-0.2) * ( (L(y, nu)*f(y)*rho_k) / (f.dprime(y)*eta_k)^2 )^(0.2)
++   h_opt[2] <- (n/10)^(-0.2) * ( (L(y, nu)*f(y)*rho_k) / (f.dprime(y)*eta_k)^2 )^(0.2)
++   h_opt[3] <- (n)^(-0.2) * ( (L(y, nu)*f(y)*rho_k) / (f.dprime(y)*eta_k)^2 )^(0.2)
++   
++   est_y_IS <- mean( L(X, nu) * k_h(y - X, h_opt[3]) )
++   est_y_sn_IS <- sum( L(X, nu) * k_h(y - X, h_opt[3]) ) / sum(L(X, nu))
++     
++   est_y_IS_1 <- mean( L(X[1:(n/10)], nu) * k_h(y - X[1:(n/10)], h_opt[2]) )
++   est_y_sn_IS_1 <- sum( L(X[1:(n/10)], nu) * k_h(y - X[1:(n/10)], h_opt[2]) ) / sum(L(X[1:(n/10)], nu))
++     
++   est_y_IS_2 <- mean( L(X[1:(n/100)], nu) * k_h(y - X[1:(n/100)], h_opt[1]) )
++   est_y_sn_IS_2 <- sum( L(X[1:(n/100)], nu) * k_h(y - X[1:(n/100)], h_opt[1]) ) / sum(L(X[1:(n/100)], nu))
++ 
++   return(list(est_IS_n = est_y_IS, est_sn_IS_n = est_y_sn_IS, est_IS_n_10 = est_y_IS_1, est_sn_IS_n_10 = est_y_sn_IS_1, est_IS_n_100 = est_y_IS_2, est_sn_IS_n_100 = est_y_sn_IS_2))
++ }
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  0.152   0.032   0.175 
