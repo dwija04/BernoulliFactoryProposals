@@ -48,8 +48,8 @@ min(ess(rwmh_chain[[1]]))/rwmh_time[3]
 mean(rwmh_chain[[2]])
 multiESS(rwmh_chain[[1]], r = 1)
 
-plot(density(rwmh_chain[[1]][, 100]), col = "blue", main = "Posterior distribution of beta_1", xlab = "beta_1")
-lines(density(bf_chain[[1]][, 100]), col = "red")
+plot(density(bf_chain[[1]][, 100]), col = "blue", main = "Posterior distribution of beta_1", xlab = "beta_1")
+lines(density(rwmh_chain[[1]][, 100]), col = "red")
 legend("topright", legend = c("RWMH", "Exact proposal"), col = c("blue", "red"), lty = 1)
 
 
