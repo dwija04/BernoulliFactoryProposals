@@ -44,7 +44,7 @@ is_positive <- function(x)
 
 
 # Running MCMC using exact proposal
-cox_bf <- function(N, init, ns, x, c, t, cov, eta)
+cox_bf <- function(N, init, ns, x, c, t, cov, prop.cov, sqrt.prop.cov, eta)
 {
   p <- length(init)
   chi <- matrix(0, N, p)
@@ -60,20 +60,8 @@ cox_bf <- function(N, init, ns, x, c, t, cov, eta)
     accept <- 0
     if(i%%(N/10) == 0) print(i)
 
-    
-    # while(!accept)
-    # {
-    #   z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
-    #   if(is_positive(z))
-    #   {
-    #     y <- z
-    #     accept <- 1
-    #   }
-    # }
-
     y <- propose_step(chi[i-1, ], L, eta)
     
-
     #Bernoulli factory
     c1 <- target(y, x, c, t, cov, ns)
     c2 <- target(chi[i-1, ], x, c, t, cov, ns)
@@ -86,7 +74,9 @@ cox_bf <- function(N, init, ns, x, c, t, cov, eta)
       C1 <- rbinom(1, 1, C)
       if(C1 == 1)
       {
-        m1 <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
+        m1 <- chi[i-1, ] + as.numeric(sqrt.prop.cov %*%rnorm(m, sd = sqrt(eta)))
+        # m1 <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
+        
         if(is_positive(m1)) p_x <- 1
         else p_x <- 0
         C2 <- rbinom(1, 1, p_x)
@@ -99,7 +89,9 @@ cox_bf <- function(N, init, ns, x, c, t, cov, eta)
       }
       else
       {
-        m2 <- y + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
+        m2 <- y + as.numeric(sqrt.prop.cov %*%rnorm(m, sd = sqrt(eta)))
+        # m2 <- y + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
+        
         if(is_positive(m2)) p_y <- 1
         else p_y <- 0
         C2 <- rbinom(1, 1, p_y)
@@ -119,54 +111,9 @@ cox_bf <- function(N, init, ns, x, c, t, cov, eta)
   return(list(chi, bernoulli_loops, accept_rate, log.post))
 }
 
-#Running MCMC using approximate proposal
-cox_mh <- function(N, init, ns, x, c, t, cov, eta)
-{
-  p <- length(init)
-  chi <- matrix(0, N, p)
-  log.post <- numeric(length = N)
-  chi[1,] <- init
-  accept_rate <- 0
-  log.post[1] <- target(chi[1, ], x, c, t, cov, ns)
-  
-  for(i in 2:N)
-  {
-    accept <- 0
-    if(i%%(N/10) == 0) print(i)
-    while(!accept)
-    {
-      z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
-      if(is_positive(z))
-      {
-        y <- z
-        accept <- 1
-      }
-    }
-    
-    #Acceptance ratio
-    num <- target(y, x, c, t, cov, ns) 
-    denom <- target(chi[i-1, ], x, c, t, cov, ns)
-    log.alpha.k <- num - denom
-    log.beta.k <- pmvnorm(mu = chi[i-1, ], sigma = cov, lb = rep(0, p), B = 200, type = "mc") 
-    log.beta.k <- log.beta.k - pmvnorm(mu = y, sigma = cov, lb = rep(0, p), B = 200, type = "mc")      
-    log.ratio <- log.alpha.k + log.beta.k
-    if(runif(1) < min(1, exp(log.ratio)))
-    {
-      chi[i, ] <- y
-      log.post[i] <- num
-    }
-    else
-    {
-      chi[i, ] <- chi[i-1, ]
-      log.post[i] <- denom
-    }
-    if( chi[i, 1] == y[1] ) accept_rate <- accept_rate + 1
-  }
-  accept_rate <- accept_rate/N
-  return(list(chi, accept_rate, log.post))
-}
 
-cox_rwmh <- function(N, init, ns, x, c, t, cov, sqrt.cov, eta)
+# Running Random Walk Metropolis Hastings
+cox_rwmh <- function(N, init, ns, x, c, t, cov, sqrt.prop.cov, eta)
 {
   p <- length(init)
   chi <- matrix(0, N, p)
@@ -179,11 +126,13 @@ cox_rwmh <- function(N, init, ns, x, c, t, cov, sqrt.cov, eta)
   {
     if(i%%(N/10) == 0) print(i)
 
-    z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
-
+    # z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
+    z <- chi[i-1, ] + as.numeric(sqrt.prop.cov %*% rnorm(p, sd = sqrt(eta)))
+                                 
     #Acceptance ratio
     num <- target(z, x, c, t, cov, ns)
     denom <- target(chi[i-1, ], x, c, t, cov, ns)
+
     ratio <- exp(num - denom)
 
     if(runif(1) < min(1, ratio))
@@ -203,126 +152,10 @@ cox_rwmh <- function(N, init, ns, x, c, t, cov, sqrt.cov, eta)
 }
 
 
-# cox_rwmh <- function(N, init, ns, x, c, t, cov, sqrt.cov, eta)
-# {
-#   p <- length(init)
-#   
-#   chi <- matrix(0, N, p)
-#   log.post <- numeric(N)
-#   
-#   chi[1,] <- init
-#   log.post[1] <- target(init, x, c, t, cov, ns)
-#   accepted <- 0
-#   
-#   for(i in 2:N)
-#   {
-#     if(i %% (N/10) == 0) print(i)
-#     
-#     z <- chi[i-1,] + sqrt(eta) * (sqrt.cov %*% rnorm(p))
-#     z <- as.numeric(z)
-#     
-#     num <- target(z, x, c, t, cov, ns)
-#     denom <- log.post[i-1]
-#     
-#     ratio <- exp(num - denom)
-#     
-#     if(runif(1) < min(1, ratio))
-#     {
-#       chi[i,] <- z
-#       log.post[i] <- num
-#       accepted <- accepted + 1
-#     }
-#     else
-#     {
-#       chi[i,] <- chi[i-1,]
-#       log.post[i] <- denom
-#     }
-#   }
-#   
-#   accept_rate <- accepted/(N-1)
-#   
-#   return(list(chain = chi, accept_rate = accept_rate, log_post = log.post))
-# }
-
 
 # To smooth the output
 smooth <- function(delta_m, t, samp, val)
 {
   t(phi(delta_m, val, t)) %*% samp
-}
-
-
-cox_bf_newbounds <- function(N, init, ns, x, c, t, cov, eta)
-{
-  p <- length(init)
-  chi <- matrix(0, N, p)
-  log.post <- numeric(length = N)
-  chi[1,] <- init
-  accept_rate <- 0
-  log.post[1] <- target(chi[1, ], x, c, t, cov, ns)
-  bernoulli_loops <- numeric(N)
-  for(i in 2:N)
-  {
-    accept <- 0
-    if(i%%(N/10) == 0) print(i)
-    
-    #Accept-Reject step
-    while(!accept)
-    {
-      z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
-      if(is_positive(z)) 
-      {
-        y <- z
-        accept <- 1
-      }
-    }
-    #Bernoulli factory
-    bx <- min(pnorm(chi[i-1, ]/sqrt(diag(cov))))
-    by <- min(pnorm(y/sqrt(diag(cov))))
-    c1 <- target(y, x, c, t, cov, ns) + log(bx)
-    c2 <- target(chi[i-1, ], x, c, t, cov, ns) + log(by)
-    C <- exp(c1 - c2)/(1 + exp(c1 - c2))
-    bern_loops <- 0
-    accept <- FALSE
-  
-    
-    while(!accept) 
-    {
-      bern_loops <- bern_loops + 1
-      C1 <- rbinom(1, 1, C)
-      
-      if(C1 == 1) 
-      {
-        m1 <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
-        if(is_positive(m1)) p_x <- bx
-        else p_x <- 0
-        C2 <- rbinom(1, 1, p_x)
-        if(C2 == 1) 
-        {
-          chi[i, ] <- y
-          log.post[i] <- c1
-          accept <- TRUE
-        }
-      } 
-      else 
-      {
-        m2 <- y + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
-        if(is_positive(m2)) p_y <- by
-        else p_y <- 0
-        C2 <- rbinom(1, 1, p_y)
-        if(C2 == 1) 
-        {
-          chi[i, ] <- chi[i-1, ]
-          log.post[i] <- c2
-          accept <- TRUE
-        }
-      }
-    }
-    bernoulli_loops[i] <- bern_loops
-    if( chi[i, 1] == y[1] ) accept_rate <- accept_rate + 1
-  }
-  bern_loops <- bern_loops/N
-  accept_rate <- accept_rate/N
-  return(list(chi, bernoulli_loops, accept_rate, log.post))
 }
 

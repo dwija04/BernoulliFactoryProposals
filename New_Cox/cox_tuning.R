@@ -81,3 +81,4 @@ sim.model2 <- simulate(model2, nsim = 1e2, seed = 1, xtest = DoE$xtest)
 
 cov_params <- model2$kernParam$par
 save(cov_params, file = "estimated-cov.RData")
+
