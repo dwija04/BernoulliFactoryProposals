@@ -53,14 +53,14 @@ cox_bf <- function(N, init, ns, x, c, t, cov, prop.cov, sqrt.prop.cov, eta)
   accept_rate <- 0
   log.post[1] <- target(chi[1, ], x, c, t, cov, n = ns)
   bernoulli_loops <- numeric(N)
-  L <- chol(cov)
+  # L <- chol(cov)
   
   for(i in 2:N)
   {
     accept <- 0
     if(i%%(N/10) == 0) print(i)
 
-    y <- propose_step(chi[i-1, ], L, eta)
+    y <- propose_step(chi[i-1, ], sqrt.prop.cov, eta)
     
     #Bernoulli factory
     c1 <- target(y, x, c, t, cov, ns)
