@@ -15,7 +15,8 @@ delta_m <- xn[[7]]
 N0 <- xn[[8]]
 mu <- xn[[9]]
 
-N <- 1e4
+init <- lam1(t)
+N <- 1e5
 #The posterior
 cov.svd <- svd(cov)
 sqrt.cov <- cov.svd$u %*% diag(cov.svd$d^(1/2), m) %*% t(cov.svd$v)
@@ -24,13 +25,10 @@ inv.cov <- qr.solve(cov)
 
 # Initial MCMC
 
-eta_rwmh_pilot <- 0.01
-foo <- cox_rwmh(1e4, init = init, ns = ns, x, c, t, cov = cov, sqrt.prop = prop.sqrt.cov, eta = eta_rwmh_pilot)
+eta_rwmh_pilot <- 0.001
+foo <- cox_rwmh(N, init = init, ns = ns, x, c, t, cov = cov, sqrt.prop = diag(1,m), eta = eta_rwmh_pilot)
 foo[[2]]
 prop.cov <- cov(foo[[1]])
-
-plot(density(foo[[1]][, 100]), main = "Posterior distribution of beta_100", xlab = "beta_1")
-lines(density(rw_dummy[[1]][, 100]), col = "red")
 
 
 prop.cov.svd <- svd(prop.cov)
@@ -38,18 +36,23 @@ prop.sqrt.cov <- prop.cov.svd$u %*% diag(prop.cov.svd$d^(1/2), m) %*% t(prop.cov
 max(prop.cov - prop.sqrt.cov %*% prop.sqrt.cov)
 prop.inv.cov <- qr.solve(prop.cov)
 
-
+eta_rwmh_pilot <- 0.01
+foo2 <- cox_rwmh(N, init = init, ns = ns, x, c, t, 
+                cov = cov, sqrt.prop = prop.sqrt.cov, 
+                eta = eta_rwmh_pilot)
+foo2[[2]]
 
 
 #Running MCMC using exact proposal
-eta_bf <- 0.005
-bf_time <- system.time(bf_chain <- cox_bf(1e4, init = init, ns = ns, x, c, t, cov = cov, prop.cov = prop.cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_bf))
+eta_bf <- 0.06
+bf_time <- system.time(bf_chain <- cox_bf(N, init = init, ns = ns, x, c, t, cov = cov, prop.cov = prop.cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_bf))
 save(bf_chain, file = "bf_chain_single.RData")
 bf_chain[[3]]
 
-plot(density(foo[[1]][, 23]), main = "Posterior distribution of beta_100", xlab = "beta_1")
-lines(density(rw_dummy[[1]][, 23]), col = "red")
-lines(density(bf_chain[[1]][, 23]), col = "blue")
+i <- 5
+plot(density(foo[[1]][, i]), main = "Posterior distribution of beta_100", xlab = "beta_1")
+lines(density(foo2[[1]][, i]), col = "red")
+lines(density(bf_chain[[1]][, i]), col = "blue")
 
 mean(ess(bf_chain[[1]]))
 min(ess(bf_chain[[1]]))/bf_time[3]
