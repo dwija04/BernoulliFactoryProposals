@@ -1,0 +1,76 @@
+
+R version 4.5.1 (2025-06-13) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> set.seed(10)
+> library(mcmcse)
+> source("cox_functions.R")
+> load("estimated-cov.RData")
+> load("cox-data.RData")
+> 
+> ns <- xn[[1]]
+> x <- xn[[2]]
+> c <- xn[[3]]
+> t <- xn[[4]]
+> cov <- xn[[5]]
+> m <- xn[[6]]
+> delta_m <- xn[[7]]
+> N0 <- xn[[8]]
+> mu <- xn[[9]]
+> 
+> # initial values
+> init <- lam1(t)
+> 
+> N <- 1e6
+> 
+> # The posterior covariance
+> cov.svd <- svd(cov)
+> sqrt.cov <- cov.svd$u %*% diag(cov.svd$d^(1/2), m) %*% t(cov.svd$v)
+> max(cov - sqrt.cov %*% sqrt.cov)
+[1] 4.662937e-15
+> inv.cov <- qr.solve(cov)
+> 
+> # Initial MCMC
+> 
+> eta_rwmh_pilot <- 0.001
+> foo <- cox_rwmh(N, init = init, ns = ns, x, c, t, cov = cov, sqrt.prop = diag(1,m), eta = eta_rwmh_pilot)
+[1] 100000
+[1] 200000
+[1] 300000
+[1] 400000
+[1] 500000
+[1] 600000
+[1] 700000
+[1] 800000
+[1] 900000
+[1] 1000000
+> foo[[2]]
+[1] 0.218634
+> prop.cov <- cov(foo[[1]])
+> 
+> prop.cov.svd <- svd(prop.cov)
+> prop.sqrt.cov <- prop.cov.svd$u %*% diag(prop.cov.svd$d^(1/2), m) %*% t(prop.cov.svd$v)
+> max(prop.cov - prop.sqrt.cov %*% prop.sqrt.cov)
+[1] 8.326673e-16
+> prop.inv.cov <- qr.solve(prop.cov)
+> 
+> save(prop.cov.svd, prop.sqrt.cov, prop.inv.cov, file = "proposal_covariance.Rdata")
+> 
+> proc.time()
+    user   system  elapsed 
+3996.187  340.913 4361.407 
