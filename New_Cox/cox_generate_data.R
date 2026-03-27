@@ -61,6 +61,8 @@ for(i in 1:m)
 cov[1,m]
 cov <- cov
 
-xn <- list(ns, x, c, t, cov, m, delta_m, N0, mu)
+init <- lam1(t)
+
+xn <- list(ns, x, c, t, cov, m, delta_m, N0, mu, init)
 save(xn, file = "cox-data.RData")
 
