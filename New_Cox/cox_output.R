@@ -110,8 +110,6 @@ print(paste("ESS per unit time BF: ", round(ess_per_time_bf, 4)))
 print(paste("ESS per unit time RWMH: ", round(ess_per_time_rwmh, 4)))
 
 bern_loops_avg <- mean(bf_chain[[2]])
-new_bern_loops_avg <- mean(bf_chain_new[[2]])
-
 summary(bf_chain[[2]])
 
 print(paste("Average number of mean loops BF: ", round(bern_loops_avg, 4)))

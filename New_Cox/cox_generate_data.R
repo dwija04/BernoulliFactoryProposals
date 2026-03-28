@@ -63,6 +63,12 @@ cov <- cov
 
 init <- lam1(t)
 
-xn <- list(ns, x, c, t, cov, m, delta_m, N0, mu, init)
+cov.svd <- svd(cov)
+sqrt.cov <- cov.svd$u %*% diag(cov.svd$d^(1/2), m) %*% t(cov.svd$v)
+max(cov - sqrt.cov %*% sqrt.cov)
+inv.cov <- qr.solve(cov)
+
+
+xn <- list(ns, x, c, t, cov, m, delta_m, N0, mu, init, sqrt.cov, inv.cov, cov.svd)
 save(xn, file = "cox-data.RData")
 

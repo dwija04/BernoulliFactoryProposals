@@ -2,6 +2,7 @@
 # library("lineqGPR")
 library(MASS)
 library(TruncatedNormal)
+
 Rcpp::sourceCpp("cox_proposal_bf.cpp")
 
 lam1 <- function(x)
@@ -75,7 +76,6 @@ cox_bf <- function(N, init, ns, x, c, t, cov, sqrt.prop.cov, eta)
       if(C1 == 1)
       {
         m1 <- chi[i-1, ] + as.numeric(sqrt.prop.cov %*%rnorm(m, sd = sqrt(eta)))
-        # m1 <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
         
         if(is_positive(m1)) p_x <- 1
         else p_x <- 0
@@ -90,8 +90,7 @@ cox_bf <- function(N, init, ns, x, c, t, cov, sqrt.prop.cov, eta)
       else
       {
         m2 <- y + as.numeric(sqrt.prop.cov %*%rnorm(m, sd = sqrt(eta)))
-        # m2 <- y + as.numeric(sqrt.cov %*%rnorm(m, sd = sqrt(eta)))
-        
+      
         if(is_positive(m2)) p_y <- 1
         else p_y <- 0
         C2 <- rbinom(1, 1, p_y)
@@ -125,8 +124,7 @@ cox_rwmh <- function(N, init, ns, x, c, t, cov, sqrt.prop.cov, eta)
   for(i in 2:N)
   {
     if(i%%(N/10) == 0) print(i)
-
-    # z <- chi[i-1, ] + as.numeric(sqrt.cov %*%rnorm(p, sd = sqrt(eta)))
+    
     z <- chi[i-1, ] + as.numeric(sqrt.prop.cov %*% rnorm(p, sd = sqrt(eta)))
                                  
     #Acceptance ratio

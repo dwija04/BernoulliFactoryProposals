@@ -3,8 +3,8 @@ library(mcmcse)
 source("cox_functions.R")
 load("estimated-cov.RData")
 load("cox-data.RData")
-load("proposal_covariance.RData")
 
+load("proposal_covariance.RData")
 ns <- xn[[1]]
 x <- xn[[2]]
 c <- xn[[3]]
@@ -15,18 +15,11 @@ delta_m <- xn[[7]]
 N0 <- xn[[8]]
 mu <- xn[[9]]
 init <- xn[[10]]
+sqrt.cov <- xn[[11]]
+inv.cov <- xn[[12]]
+cov.svd <- xn[[13]]
 
-
-
-N <- 1e3
-
-#The posterior
-
-cov.svd <- svd(cov)
-sqrt.cov <- cov.svd$u %*% diag(cov.svd$d^(1/2), m) %*% t(cov.svd$v)
-max(cov - sqrt.cov %*% sqrt.cov)
-inv.cov <- qr.solve(cov)
-
+N <- 1e6
 
 #Running MCMC using exact proposal
 eta_bf <- 0.06

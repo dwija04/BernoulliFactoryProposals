@@ -2,27 +2,11 @@ set.seed(1)
 source("cox_functions.R")
 load("estimated-cov.RData")
 load("cox-data.RData")
-load("cox-proposal-matrix.RData")
+load("proposal_covariance.RData")
+
 library(foreach) 
 library(doParallel)
 library(mcmcse)
-
-cov <- xn[[5]]
-m <- xn[[6]]
-
-# The posterior
-cov.svd <- svd(cov)
-sqrt.cov <- cov.svd$u %*% diag(cov.svd$d^(1/2), m) %*% t(cov.svd$v)
-max(cov - sqrt.cov %*% sqrt.cov)
-inv.cov <- qr.solve(cov)
-
-
-# Proposal matrix
-prop.cov.svd <- svd(prop.cov)
-prop.sqrt.cov <- prop.cov.svd$u %*% diag(prop.cov.svd$d^(1/2), m) %*% t(prop.cov.svd$v)
-max(prop.cov - prop.sqrt.cov %*% prop.sqrt.cov)
-prop.inv.cov <- qr.solve(prop.cov)
-
 
 N <- 2e5
 eta_bf <- 0.06
@@ -39,19 +23,19 @@ delta_m <- xn[[7]]
 N0 <- xn[[8]]
 mu <- xn[[9]]
 init <- xn[[10]]
-
+sqrt.cov <- xn[[11]]
+inv.cov <- xn[[12]]
+cov.svd <- xn[[13]]
 
 
 output_ram <- list()
-num_cores <- 50
+num_cores <- 2
 doParallel::registerDoParallel(cores = num_cores)
 
 #Number of repetitions
 reps <- 100
 
 output_cox <- foreach(b = 1:reps) %dopar% {
-  # bf_time <- system.time(bf <- cox_bf(n, init = rep(1, m), ns = ns, x, c, t, cov, eta_bf))
-  # mh_time <- system.time(mh <- cox_mh(n, init = rep(1, m), ns = ns, x, c, t, cov, eta_mh))
   bf_time <- system.time(bf <- cox_bf(N, init = init, ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_bf))
   rwmh_time <- system.time(rwmh <- cox_rwmh(N, init = init, ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_rwmh))
   bf_chain <- bf[[1]]
