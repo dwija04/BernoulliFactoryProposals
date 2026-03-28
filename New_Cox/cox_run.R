@@ -25,8 +25,8 @@ prop.inv.cov <- qr.solve(prop.cov)
 
 
 N <- 2e5
-eta_bf <- 0.05
-eta_rwmh <- 0.05
+eta_bf <- 0.06
+eta_rwmh <- 0.03
 
 #extracting data
 ns <- xn[[1]]
@@ -43,16 +43,16 @@ init <- xn[[10]]
 
 
 output_ram <- list()
-num_cores <- 4
+num_cores <- 50
 doParallel::registerDoParallel(cores = num_cores)
 
 #Number of repetitions
-reps <- 10
+reps <- 100
 
 output_cox <- foreach(b = 1:reps) %dopar% {
   # bf_time <- system.time(bf <- cox_bf(n, init = rep(1, m), ns = ns, x, c, t, cov, eta_bf))
   # mh_time <- system.time(mh <- cox_mh(n, init = rep(1, m), ns = ns, x, c, t, cov, eta_mh))
-  bf_time <- system.time(bf <- cox_bf(N, init = init, ns = ns, x, c, t, cov = cov, prop.cov = prop.cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_bf))
+  bf_time <- system.time(bf <- cox_bf(N, init = init, ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_bf))
   rwmh_time <- system.time(rwmh <- cox_rwmh(N, init = init, ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_rwmh))
   bf_chain <- bf[[1]]
   rwmh_chain <- rwmh[[1]]

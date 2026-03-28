@@ -44,7 +44,7 @@ is_positive <- function(x)
 
 
 # Running MCMC using exact proposal
-cox_bf <- function(N, init, ns, x, c, t, cov, prop.cov, sqrt.prop.cov, eta)
+cox_bf <- function(N, init, ns, x, c, t, cov, sqrt.prop.cov, eta)
 {
   p <- length(init)
   chi <- matrix(0, N, p)
