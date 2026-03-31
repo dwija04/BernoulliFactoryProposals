@@ -24,6 +24,11 @@ bf_MultiESS <- numeric(reps)
 bf_time <- numeric(reps)
 bf_ess <- matrix(nrow = reps, ncol = m)
 
+rwmh_MultiESS <- numeric(reps)
+rwmh_time <- numeric(reps)
+rwmh_ess <- matrix(nrow = reps, ncol = m)
+
+
 mh_MultiESS <- numeric(reps)
 mh_time <- numeric(reps)
 mh_ess <- matrix(nrow = reps, ncol = m)
@@ -34,38 +39,47 @@ for(i in 1:reps)
   foo <- output_cox[[i]]
   
   bf_time[i] <- foo[[1]]
-  mh_time[i] <- foo[[2]]
-  bf_loops_avg[i] <- foo[[3]]
-  bf_loops_max[i] <- foo[[4]]
-  bf_MultiESS[i] <- foo[[5]]
-  mh_MultiESS[i] <- foo[[6]]
-  bf_ess[i, ] <- foo[[7]]
-  mh_ess[i, ] <- foo[[8]]
+  rwmh_time[i] <- foo[[2]]
+  mh_time[i] <- foo[[3]]
+  
+  bf_loops_avg[i] <- foo[[4]]
+  bf_loops_max[i] <- foo[[5]]
+  
+  bf_MultiESS[i] <- foo[[6]]
+  rwmh_MultiESS[i] <- foo[[7]]
+  mh_MultiESS[i] <- foo[[8]]
+  
+  bf_ess[i, ] <- foo[[9]]
+  rwmh_ess[i, ] <- foo[[10]]
+  mh_ess[i, ] <- foo[[11]]
 }
 
 print(paste("Average number of mean loops: ", round(mean(bf_loops_avg), 4)))
 print(paste("Average number of max loops: ", round(mean(bf_loops_max), 4)))
 
 bf_mESS_per_unit_time <- bf_MultiESS/bf_time
+rwmh_mESS_per_unit_time <- rwmh_MultiESS/rwmh_time
 mh_mESS_per_unit_time <- mh_MultiESS/mh_time
 
 Multi_ESS_df <- data.frame(
-  Method = c("Bernoulli Factory", "Metropolis Hastings"),
-  MultiESS = c(round(mean(bf_MultiESS), 0), round(mean(mh_MultiESS), 0)),
-  MultiESS_by_time = c(round(mean(bf_mESS_per_unit_time), 4), round(mean(mh_mESS_per_unit_time), 4)),
-  Avg_compute_time = c(round(mean(bf_time), 0), round(mean(mh_time), 0))
+  Method = c("Bernoulli Factory", "Random Walk Metropolis Hastings", "Inexact Metropolis Hastings"),
+  MultiESS = c(round(mean(bf_MultiESS), 0), round(mean(rwmh_MultiESS), 0), round(mean(mh_MultiESS), 0)),
+  MultiESS_by_time = c(round(mean(bf_mESS_per_unit_time), 4), round(mean(rwmh_mESS_per_unit_time), 4), round(mean(mh_mESS_per_unit_time), 4)),
+  Avg_compute_time = c(round(mean(bf_time), 0), round(mean(rwmh_time), 0), round(mean(mh_time), 0))
 )
 
 print(Multi_ESS_df)
 
 avg_ess_bf <- round(colMeans(bf_ess), 0)
+avg_ess_rwmh <- round(colMeans(rwmh_ess), 0)
 avg_ess_mh <- round(colMeans(mh_ess), 0)
 
 ESS_df <- data.frame(
   Method = c("Component 1", "Component 2", "Component 3", "Component 4", "Component 5", "Component 6", 
              "Component 7", "Component 8", "Component 9", "Component 10"),
   Bernoulli_ESS = avg_ess_bf,
-  Auxiliary_ESS = avg_ess_mh
+  RWMH_ESS = avg_ess_rwmh,
+  Inexact_MH_ESS = avg_ess_mh,
 )
 
 print(ESS_df)
@@ -88,25 +102,32 @@ est_fun2 <- numeric(length = length(grid))
 
 bf_samps <- bf_chain[[1]]
 rwmh_samps <- rwmh_chain[[1]]
+mh_samps <- mh_chain[[1]]
 
 #log posterior
 log_post_bf <- bf_chain[[4]]
 log_post_rwmh <- rwmh_chain[[3]]
+log_post_mh <- mh_chain[[3]]
 
 ess_bf <- min(ess(bf_samps))
 ess_rwmh <- min(ess(rwmh_samps))
+ess_mh <- min(ess(mh_samps))
 
 time_bf <- bf_time[3]
 time_rwmh <- rwmh_time[3]
+time_mh <- mh_time[3]
 
 print(paste("Min ESS BF: ", ess_bf))
 print(paste("Min ESS RWMH: ", ess_rwmh))
+print(paste("Min ESS MH: ", ess_mh))
 
 ess_per_time_bf <- ess_bf/time_bf
 ess_per_time_rwmh <- ess_rwmh/time_rwmh 
+ess_per_time_mh <- ess_mh/time_mh
 
 print(paste("ESS per unit time BF: ", round(ess_per_time_bf, 8)))
 print(paste("ESS per unit time RWMH: ", round(ess_per_time_rwmh, 8)))
+print(paste("ESS per unit time MH: ", round(ess_per_time_mh, 8)))
 
 bern_loops_avg <- mean(bf_chain[[2]])
 summary(bf_chain[[2]])
@@ -122,7 +143,8 @@ pdf("plots/cox-component-density.pdf")
 j <- 10
 plot(density(bf_samps[-c(1:1000), j]), col = "blue", ylab = "Estimated Density", xlab = "x", main = "", lwd = 2)
 lines(density(rwmh_samps[-c(1:1000), j]), col = "green")
-legend("topright", legend = c("Bernoulli Factory", "RWMH"), col = c("blue", "green"), lwd = 2)
+lines(density(mh_samps[-c(1:1000), j]), col = "red")
+legend("topright", legend = c("Bernoulli Factory", "RWMH", "Inexact MH"), col = c("blue", "green", "red"), lwd = 2)
 dev.off()
 
 
@@ -130,6 +152,7 @@ pdf("plots/cox-component-density-100.pdf")
 j <- 100
 plot(density(bf_samps[-c(1:1000), j]), col = "blue", ylab = "Estimated Density", xlab = "x", main = "", lwd = 2)
 lines(density(rwmh_samps[-c(1:1000), j]), col = "green")
-legend("topright", legend = c("Bernoulli Factory", "RWMH"), col = c("blue", "green"), lwd = 2)
+lines(density(mh_samps[-c(1:1000), j]), col = "red")
+legend("topright", legend = c("Bernoulli Factory", "RWMH", "Inexact MH"), col = c("blue", "green", "red"), lwd = 2)
 dev.off()
 

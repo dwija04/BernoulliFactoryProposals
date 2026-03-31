@@ -149,6 +149,53 @@ cox_rwmh <- function(N, init, ns, x, c, t, cov, sqrt.prop.cov, eta)
   return(list(chi, accept_rate, log.post))
 }
 
+## Using the inexact proposal
+cox_mh <- function(N, init, ns, x, c, t, cov, sqrt.prop.cov, eta)
+{
+  p <- length(init)
+  chi <- matrix(0, N, p)
+  log.post <- numeric(length = N)
+  chi[1,] <- init
+  accept_rate <- 0
+  log.post[1] <- target(chi[1, ], x, c, t, cov, ns)
+  
+  for(i in 2:N)
+  {
+    accept <- 0
+    if(i%%(N/10) == 0) print(i)
+    while(!accept)
+    {
+      z <- chi[i-1, ] + as.numeric(sqrt.prop.cov %*%rnorm(p, sd = sqrt(eta)))
+      if(is_positive(z))
+      {
+        y <- z
+        accept <- 1
+      }
+    }
+    
+    #Acceptance ratio
+    num <- target(y, x, c, t, cov, ns) 
+    denom <- target(chi[i-1, ], x, c, t, cov, ns)
+    log.alpha.k <- num - denom
+    log.beta.k <- pmvnorm(mu = chi[i-1, ], sigma = cov, lb = rep(0, p), B = 200, type = "mc") 
+    log.beta.k <- log.beta.k - pmvnorm(mu = y, sigma = cov, lb = rep(0, p), B = 200, type = "mc")      
+    log.ratio <- log.alpha.k + log.beta.k
+    if(runif(1) < min(1, exp(log.ratio)))
+    {
+      chi[i, ] <- y
+      log.post[i] <- num
+    }
+    else
+    {
+      chi[i, ] <- chi[i-1, ]
+      log.post[i] <- denom
+    }
+    if( chi[i, 1] == y[1] ) accept_rate <- accept_rate + 1
+  }
+  accept_rate <- accept_rate/N
+  return(list(chi, accept_rate, log.post))
+}
+
 
 
 # To smooth the output
