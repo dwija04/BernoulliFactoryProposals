@@ -56,7 +56,7 @@ Type 'q()' to quit R.
 > bf_chain[[3]]
 [1] 0.160071
 > 
-> eta_rwmh <- 0.03
+> eta_rwmh <- 0.01
 > rwmh_time <- system.time(rwmh_chain <- cox_rwmh(N, init = rep(1, m), ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_rwmh))
 [1] 100000
 [1] 200000
@@ -69,7 +69,7 @@ Type 'q()' to quit R.
 [1] 900000
 [1] 1000000
 > rwmh_chain[[2]]
-[1] 0.093924
+[1] 0.269981
 > plot(density(rwmh_chain[[1]][, 100]))
 > 
 > 
@@ -79,4 +79,4 @@ Type 'q()' to quit R.
 > 
 > proc.time()
      user    system   elapsed 
-13978.833     6.963 13986.009 
+10109.669     4.912 10115.940 

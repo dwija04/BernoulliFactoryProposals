@@ -26,7 +26,7 @@ eta_bf <- 0.06
 bf_time <- system.time(bf_chain <- cox_bf(N, init = init, ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_bf))
 bf_chain[[3]]
 
-eta_rwmh <- 0.03
+eta_rwmh <- 0.01
 rwmh_time <- system.time(rwmh_chain <- cox_rwmh(N, init = rep(1, m), ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_rwmh))
 rwmh_chain[[2]]
 plot(density(rwmh_chain[[1]][, 100]))

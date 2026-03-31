@@ -10,7 +10,7 @@ library(mcmcse)
 
 N <- 2e5
 eta_bf <- 0.06
-eta_rwmh <- 0.03
+eta_rwmh <- 0.01
 
 #extracting data
 ns <- xn[[1]]
@@ -29,7 +29,7 @@ cov.svd <- xn[[13]]
 
 
 output_ram <- list()
-num_cores <- 2
+num_cores <- 50
 doParallel::registerDoParallel(cores = num_cores)
 
 #Number of repetitions
