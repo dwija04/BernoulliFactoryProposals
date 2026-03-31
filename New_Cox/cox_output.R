@@ -44,7 +44,7 @@ for(i in 1:reps)
 }
 
 print(paste("Average number of mean loops: ", round(mean(bf_loops_avg), 4)))
-print(paste("Average number of max loops for: ", round(mean(bf_loops_max), 4)))
+print(paste("Average number of max loops: ", round(mean(bf_loops_max), 4)))
 
 bf_mESS_per_unit_time <- bf_MultiESS/bf_time
 mh_mESS_per_unit_time <- mh_MultiESS/mh_time
@@ -68,7 +68,7 @@ ESS_df <- data.frame(
   Auxiliary_ESS = avg_ess_mh
 )
 
-# print(ESS_df)
+print(ESS_df)
 
 ##########################################
 # Single chain output (plots)
@@ -85,7 +85,6 @@ delta_m <- 50/(m-1)
 grid <- seq(0, 50, length = 100)
 est_fun1 <- numeric(length = length(grid))
 est_fun2 <- numeric(length = length(grid))
-
 
 bf_samps <- bf_chain[[1]]
 rwmh_samps <- rwmh_chain[[1]]
@@ -106,8 +105,8 @@ print(paste("Min ESS RWMH: ", ess_rwmh))
 ess_per_time_bf <- ess_bf/time_bf
 ess_per_time_rwmh <- ess_rwmh/time_rwmh 
 
-print(paste("ESS per unit time BF: ", round(ess_per_time_bf, 4)))
-print(paste("ESS per unit time RWMH: ", round(ess_per_time_rwmh, 4)))
+print(paste("ESS per unit time BF: ", round(ess_per_time_bf, 8)))
+print(paste("ESS per unit time RWMH: ", round(ess_per_time_rwmh, 8)))
 
 bern_loops_avg <- mean(bf_chain[[2]])
 summary(bf_chain[[2]])
@@ -125,3 +124,12 @@ plot(density(bf_samps[-c(1:1000), j]), col = "blue", ylab = "Estimated Density",
 lines(density(rwmh_samps[-c(1:1000), j]), col = "green")
 legend("topright", legend = c("Bernoulli Factory", "RWMH"), col = c("blue", "green"), lwd = 2)
 dev.off()
+
+
+pdf("plots/cox-component-density-100.pdf")
+j <- 100
+plot(density(bf_samps[-c(1:1000), j]), col = "blue", ylab = "Estimated Density", xlab = "x", main = "", lwd = 2)
+lines(density(rwmh_samps[-c(1:1000), j]), col = "green")
+legend("topright", legend = c("Bernoulli Factory", "RWMH"), col = c("blue", "green"), lwd = 2)
+dev.off()
+
