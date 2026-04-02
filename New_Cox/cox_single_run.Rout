@@ -56,6 +56,7 @@ Type 'q()' to quit R.
 > bf_chain[[3]]
 [1] 0.160071
 > 
+> # Running MCMC using RWMH
 > eta_rwmh <- 0.01
 > rwmh_time <- system.time(rwmh_chain <- cox_rwmh(N, init = rep(1, m), ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_rwmh))
 [1] 100000
@@ -70,13 +71,30 @@ Type 'q()' to quit R.
 [1] 1000000
 > rwmh_chain[[2]]
 [1] 0.269981
-> plot(density(rwmh_chain[[1]][, 100]))
+> 
+> # Running MCMC using inexact proposal
+> eta_mh <- 0.08
+> mh_time <- system.time(mh_chain <- cox_mh(N, init = rep(1, m), ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_mh))
+[1] 100000
+[1] 200000
+[1] 300000
+[1] 400000
+[1] 500000
+[1] 600000
+[1] 700000
+[1] 800000
+[1] 900000
+[1] 1000000
+> mh_chain[[2]]
+[1] 0.181106
+> plot(density(mh_chain[[1]][, 100]))
 > 
 > 
-> save(bf_chain, rwmh_chain,  file = "output_cox_single_run.RData")
-> save(bf_time, rwmh_time, file = "output_cox_times.RData")
+> save(bf_chain, rwmh_chain, mh_chain, file = "output_cox_single_run.RData")
+> save(bf_time, rwmh_time, mh_time, file = "output_cox_times.RData")
+> 
 > 
 > 
 > proc.time()
-     user    system   elapsed 
-10109.669     4.912 10115.940 
+    user   system  elapsed 
+92396.56    72.76 92470.87 
