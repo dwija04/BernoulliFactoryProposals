@@ -79,7 +79,7 @@ ESS_df <- data.frame(
              "Component 7", "Component 8", "Component 9", "Component 10"),
   Bernoulli_ESS = avg_ess_bf,
   RWMH_ESS = avg_ess_rwmh,
-  Inexact_MH_ESS = avg_ess_mh,
+  Inexact_MH_ESS = avg_ess_mh
 )
 
 print(ESS_df)
