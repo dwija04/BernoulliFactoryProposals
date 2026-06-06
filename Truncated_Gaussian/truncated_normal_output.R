@@ -33,6 +33,7 @@ bernoulli_df <- data.frame(
 )
 print(bernoulli_df)
 
+
 #Effective Sample Size
 
 avg_bf_ess <- round(mean(bf_ess))
@@ -58,25 +59,25 @@ load("output_trunc_gaussian_single_run.RData")
 #Density Plots
 
 
-pdf("plots/trunc_gauss_density.pdf")
+pdf("plots/trunc_gauss_density.pdf", height = 4, width = 5)
 x <- seq(0, 15, 0.01)
-plot(density(bf_chain[[1]]), ylim = c(0, .4), col = "blue", main = " ", xlab = "x", ylab = "Estimated Density")
-lines(density(mh_chain[[1]]), col = "red")
-lines(x, dgamma(x, shape = 2, rate = 1), col = "black")
+plot(density(bf_chain[[1]]), ylim = c(0, .4), col = "blue", lwd = 2, main = " ", xlab = "x", ylab = "Estimated Density")
+lines(density(mh_chain[[1]]), col = "red", lwd = 2)
+lines(x, dgamma(x, shape = 2, rate = 1), col = "black", lwd = 2)
 legend("topright", legend = c("Target density", "Bernoulli factory MCMC", "Approximate Metropolis-Hastings") ,
-  col = c("black","blue","red"), lty = c(1, 1, 1), cex = 1.2, bty = "n")
+  col = c("black","blue","red"), lty = c(1, 1, 1), cex = 1, bty = "n", lwd = 2)
 dev.off()
 
-pdf("plots/trunc_gauss_acf.pdf")
+pdf("plots/trunc_gauss_acf.pdf", height = 4, width = 5)
 lag.max <- 40
 mh_acf <- acf(mh_chain[[1]], lag.max = lag.max , plot = FALSE)$acf
 bf_acf <- acf(bf_chain[[1]], lag.max = lag.max , plot = FALSE)$acf
 plot(0:lag.max , mh_acf, type = 'l', col = "red",
-  ylab = "Estimated Autocorrelation Function", xlab = "Lags")
-lines(0:lag.max , bf_acf, col = "blue")
+  ylab = "Estimated Autocorrelation Function", xlab = "Lags", lwd = 2)
+lines(0:lag.max , bf_acf, col = "blue", lwd = 2)
 legend("topright", legend = c("Bernoulli factory MCMC", "Approximate Metropolis-Hastings") ,
   col = c("blue","red"), lty = c(1, 1, 1),
-  cex = 1.2, bty = "n")
+  cex = 1, bty = "n", lwd =2)
 dev.off()
 
 

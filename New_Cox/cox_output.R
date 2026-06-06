@@ -139,20 +139,20 @@ temp <- seq(0, 50, length = 1e4)
 y_temp <- (lam1(temp))
 
 
-pdf("plots/cox-component-density.pdf")
+pdf("plots/cox-component-density.pdf", height = 4, width = 5)
 j <- 10
-plot(density(rwmh_samps[-c(1:1000), j]), col = "black", ylab = "Estimated Density", xlab = "x", main = "", lwd = 1)
-lines(density(bf_samps[-c(1:1000), j]), col = "blue", lwd = 1)
-lines(density(mh_samps[-c(1:1000), j]), col = "red", lwd = 1)
-legend("topright", legend = c("Bernoulli Factory", "RWMH", "Inexact MH"), col = c("black", "blue", "red"), lwd = 1, cex = 0.8,  bty = "n")
+plot(density(rwmh_samps[-c(1:1000), j]), col = "black", ylab = "Estimated Density", xlab = "x", main = "", lwd = 2)
+lines(density(bf_samps[-c(1:1000), j]), col = "blue", lwd = 2)
+lines(density(mh_samps[-c(1:1000), j]), col = "red", lwd = 2)
+legend("topright", legend = c("Bernoulli Factory", "RWMH", "Inexact MH"), col = c("black", "blue", "red"), lwd = 2, cex = 0.8,  bty = "n")
 dev.off()
 
 
-pdf("plots/cox-component-density-100.pdf")
+pdf("plots/cox-component-density-100.pdf", height = 4, width = 5)
 j <- 100
-plot(density(rwmh_samps[-c(1:1000), j]), col = "black", ylab = "Estimated Density", xlab = "x", main = "", lwd = 1)
-lines(density(bf_samps[-c(1:1000), j]), col = "blue", lwd = 1)
-lines(density(mh_samps[-c(1:1000), j]), col = "red", lwd = 1)
-legend("topright", legend = c("Bernoulli Factory", "RWMH", "Inexact MH"), col = c("black", "blue", "red"), lwd = 1,  bty = "n")
+plot(density(rwmh_samps[-c(1:1000), j]), col = "black", ylab = "Estimated Density", xlab = "x", main = "", lwd = 2)
+lines(density(bf_samps[-c(1:1000), j]), col = "blue", lwd = 2)
+lines(density(mh_samps[-c(1:1000), j]), col = "red", lwd = 2)
+legend("topright", legend = c("Bernoulli Factory", "RWMH", "Inexact MH"), col = c("black", "blue", "red"), lwd = 2,  bty = "n")
 dev.off()
 

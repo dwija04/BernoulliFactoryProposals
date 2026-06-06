@@ -139,7 +139,7 @@ sensor_2.bern <- bf_chain_single[[1]][, 3:4]
 sensor_3.bern <- bf_chain_single[[1]][, 5:6]
 sensor_4.bern <- bf_chain_single[[1]][, 7:8]
 
-pdf("plots/sensor_bernoulli.pdf")
+pdf("plots/sensor_bernoulli.pdf", height = 5, width = 5)
 par(mfrow = c(2, 2))
 plot(sensor_1.bern[, 1], sensor_1.bern[, 2], xlab = expression(x[11]), ylab = expression(x[12]), main = "Sensor 1")
 plot(sensor_2.bern[, 1], sensor_2.bern[, 2], xlab = expression(x[21]), ylab = expression(x[22]), main = "Sensor 2")
@@ -152,7 +152,7 @@ sensor_2.aux <- aux_chain_single[[1]][, 3:4]
 sensor_3.aux <- aux_chain_single[[1]][, 5:6]
 sensor_4.aux <- aux_chain_single[[1]][, 7:8]
 
-pdf("plots/sensor_aux.pdf")
+pdf("plots/sensor_aux.pdf", height = 4, width = 5)
 par(mfrow = c(2, 2))
 plot(sensor_1.aux[, 1], sensor_1.aux[, 2], xlab = expression(x[11]), ylab = expression(x[12]), main = "Sensor 1")
 plot(sensor_2.aux[, 1], sensor_2.aux[, 2], xlab = expression(x[21]), ylab = expression(x[22]), main = "Sensor 2")
