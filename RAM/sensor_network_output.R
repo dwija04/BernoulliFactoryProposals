@@ -18,6 +18,7 @@ bf_up_loops_max <- matrix(nrow = reps, ncol = p/2)
 bf_bern_loops_avg <- matrix(nrow = reps, ncol = p/2)
 bf_bern_loops_max <- matrix(nrow = reps, ncol = p/2)
 
+
 aux_down_loops_avg <- matrix(nrow = reps, ncol = p/2)
 aux_down_loops_max <- matrix(nrow = reps, ncol = p/2)
 aux_up_loops_avg <- matrix(nrow = reps, ncol = p/2)
@@ -30,6 +31,9 @@ aux_multi_ess <- numeric(reps)
 
 bf_ess <- matrix(nrow = reps, ncol = p)
 aux_ess <- matrix(nrow = reps, ncol = p)
+
+bf_ESJD <- matrix(nrow = reps, ncol = p)
+aux_ESJD <- matrix(nrow = reps, ncol = p)
 
 for(i in 1:reps)
 {
@@ -58,6 +62,10 @@ for(i in 1:reps)
   
   bf_ess[i, ] <- foo1[[9]] 
   aux_ess[i, ] <- foo2[[9]]
+  
+  bf_ESJD[i, ] <- foo1[[10]]
+  aux_ESJD[i, ] <- foo2[[10]]
+  
   
 }
 
@@ -121,7 +129,12 @@ ESS <- data.frame(
 
 print(ESS)
 
+ESJD_df <- data.frame(
+  Method = c("Bernoulli Factory", "Auxiliary Variable"),
+  ESJD = c(round(mean(bf_esjd), 4), round(mean(aux_esjd), 4))
+)
 
+print(ESJD_df)
 ##########################################
 # Plots from single run
 ##########################################

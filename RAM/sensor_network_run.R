@@ -71,9 +71,11 @@ output_ram_bern <- foreach(b = 1:reps) %dopar% {
   
   bf_ess <- ess(bf_chain)
   
+  bf_ESJD <- ESJD(bf_chain)
+  
 
   list(bf_time, bf_down_loops_avg, bf_down_loops_max, bf_up_loops_avg, bf_up_loops_max, 
-       bf_bern_loops_avg, bf_bern_loops_max, bf_multi_ess, bf_ess)
+       bf_bern_loops_avg, bf_bern_loops_max, bf_multi_ess, bf_ess, bf_ESJD)
 }
 
 
@@ -93,10 +95,11 @@ output_ram_aux <- foreach(b = 1:reps) %dopar% {
   aux_multi_ess <- multiESS(aux_chain)
   aux_time <- aux_time[3]
   aux_ess <- ess(aux_chain)
+  aux_ESJD <- ESJD(aux_chain)
   
 
   list(aux_time, aux_down_loops_avg, aux_down_loops_max, aux_up_loops_avg, 
-       aux_up_loops_max, aux_z_loops_avg, aux_z_loops_max, aux_multi_ess, aux_ess)
+       aux_up_loops_max, aux_z_loops_avg, aux_z_loops_max, aux_multi_ess, aux_ess, aux_ESJD)
 }
 
 save(output_ram_bern, output_ram_aux, file = "output_RAM.RData")

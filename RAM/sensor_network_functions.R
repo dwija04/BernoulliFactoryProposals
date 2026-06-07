@@ -331,3 +331,10 @@ MHwG.RAM.bernoulli <- function(initial.loc, jump.scale, Ob, Os, Xb, Xs, Yb, Ys, 
        N.bern = N_bern[-c(1 : n.burn), ])
   
 }
+
+
+#### Function to calculate ESJD (expected square jumping distance)
+
+ESJD <- function(x) {
+  sum((x[-1, ] - x[-nrow(x), ])^2) / (nrow(x) - 1)
+}

@@ -204,3 +204,37 @@ smooth <- function(delta_m, t, samp, val)
   t(phi(delta_m, val, t)) %*% samp
 }
 
+
+### Long RWMH for mean benchmarking
+
+cox_rwmh_long <- function(N, init, ns, x, c, t, cov, sqrt.prop.cov, eta)
+{
+  p <- length(init)
+  chi_sum <- numeric(length = p)
+  log.post <- numeric(length = N)
+
+  pre <- init
+  current_lp <- target(pre, x, c, t, cov, ns)
+  chi_sum <- pre
+  accept_rate <- 0
+  
+  for(i in 2:N)
+  {
+    if(i%%(N/100) == 0) print(i)
+    z <- pre + as.numeric(sqrt.prop.cov %*% rnorm(p, sd = sqrt(eta)))
+    proposed_lp <- target(z, x, c, t, cov, ns)
+    
+    if(log(runif(1)) < proposed_lp - current_lp)
+    {
+      pre <- z
+      current_lp <- proposed_lp
+      accept_rate <- accept_rate + 1
+    }
+    chi_sum <- chi_sum + pre
+  }
+  
+  list(
+    chi_mean = chi_sum/N,
+    accept_rate = accept_rate/(N-1)
+  )
+}

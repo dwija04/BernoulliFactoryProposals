@@ -31,6 +31,15 @@ eta_rwmh <- 0.01
 rwmh_time <- system.time(rwmh_chain <- cox_rwmh(N, init = rep(1, m), ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_rwmh))
 rwmh_chain[[2]]
 
+## Running a long chain for the posterior mean benchmark
+
+eta_rwmh <- 0.01
+rwmh_long_time <- system.time( rwmh_long_chain <- cox_rwmh_long(1e8, init = rep(1, m), ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_rwmh))
+rwmh_long_chain[[2]]
+post_mean_true <- rwmh_long_chain[[1]]
+
+
+
 # Running MCMC using inexact proposal
 eta_mh <- 0.08
 mh_time <- system.time(mh_chain <- cox_mh(N, init = rep(1, m), ns = ns, x, c, t, cov = cov, sqrt.prop.cov = prop.sqrt.cov, eta = eta_mh))
