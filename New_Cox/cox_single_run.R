@@ -49,5 +49,5 @@ plot(density(mh_chain[[1]][, 100]))
 
 save(bf_chain, rwmh_chain, mh_chain, file = "output_cox_single_run.RData")
 save(bf_time, rwmh_time, mh_time, file = "output_cox_times.RData")
-
+save(post_mean_true, file = "posterior_mean_true.RData")
 

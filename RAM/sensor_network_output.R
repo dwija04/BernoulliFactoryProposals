@@ -4,6 +4,7 @@
 ##########################################
 
 load("output_RAM.RData")
+source("sensor_network_functions.R")
 
 reps <- length(output_ram_bern)
 p <- 8 #dimension
