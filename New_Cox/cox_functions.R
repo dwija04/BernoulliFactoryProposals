@@ -238,3 +238,7 @@ cox_rwmh_long <- function(N, init, ns, x, c, t, cov, sqrt.prop.cov, eta)
     accept_rate = accept_rate/(N-1)
   )
 }
+
+ESJD <- function(x) {
+  sum((x[-1, ] - x[-nrow(x), ])^2) / (nrow(x) - 1)
+}

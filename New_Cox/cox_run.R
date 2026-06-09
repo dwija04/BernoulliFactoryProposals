@@ -3,6 +3,7 @@ source("cox_functions.R")
 load("estimated-cov.RData")
 load("cox-data.RData")
 load("proposal_covariance.RData")
+load("posterior_mean_true.RData")
 
 library(foreach) 
 library(doParallel)
@@ -60,9 +61,17 @@ output_cox <- foreach(b = 1:reps) %dopar% {
   rwmh_ess <- ess(rwmh_chain)
   mh_ess <- ess(mh_chain)
   
+  bf_ESJD <- ESJD(bf_chain)
+  rwmh_ESJD <- ESJD(rwmh_chain)
+  mh_ESJD <- ESJD(mh_chain)
+  
+  mse_bf <- mean((colMeans(bf_chain) - post_mean_true)^2)
+  mse_rwmh <- mean((colMeans(rwmh_chain) - post_mean_true)^2)
+  mse_mh <- mean((colMeans(mh_chain) - post_mean_true)^2)
+  
   print(paste('Replication:', b))
   
-  list(bf_time, rwmh_time, mh_time, bf_loops_avg, bf_loops_max, bf_multi_ess, rwmh_multi_ess, mh_multi_ess, bf_ess, rwmh_ess, mh_ess)
+  list(bf_time, rwmh_time, mh_time, bf_loops_avg, bf_loops_max, bf_multi_ess, rwmh_multi_ess, mh_multi_ess, bf_ess, rwmh_ess, mh_ess, bf_ESJD, rwmh_ESJD, mh_ESJD, mse_bf, mse_rwmh, mse_mh)
 }
 
 save(N, output_cox, file = "output_Cox.RData")
