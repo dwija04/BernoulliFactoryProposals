@@ -64,8 +64,8 @@ for(i in 1:reps)
   bf_ess[i, ] <- foo1[[9]] 
   aux_ess[i, ] <- foo2[[9]]
   
-  bf_ESJD[i, ] <- foo1[[10]]
-  aux_ESJD[i, ] <- foo2[[10]]
+  bf_ESJD[i] <- foo1[[10]]
+  aux_ESJD[i] <- foo2[[10]]
   
   
 }
@@ -132,7 +132,7 @@ print(ESS)
 
 ESJD_df <- data.frame(
   Method = c("Bernoulli Factory", "Auxiliary Variable"),
-  ESJD = c(round(mean(bf_esjd), 4), round(mean(aux_esjd), 4))
+  ESJD = c(round(mean(bf_ESJD), 4), round(mean(aux_ESJD), 4))
 )
 
 print(ESJD_df)
