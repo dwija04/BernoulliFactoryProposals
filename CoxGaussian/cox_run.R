@@ -2,7 +2,7 @@ set.seed(1)
 source("cox_functions.R")
 load("estimated-cov.RData")
 load("cox-data.RData")
-load("proposal_covariance.RData")
+load("proposal_covariance.Rdata")
 load("posterior_mean_true.RData")
 
 library(foreach) 
@@ -65,9 +65,9 @@ output_cox <- foreach(b = 1:reps) %dopar% {
   rwmh_ESJD <- ESJD(rwmh_chain)
   mh_ESJD <- ESJD(mh_chain)
   
-  mse_bf <- mean((colMeans(bf_chain) - post_mean_true)^2)
-  mse_rwmh <- mean((colMeans(rwmh_chain) - post_mean_true)^2)
-  mse_mh <- mean((colMeans(mh_chain) - post_mean_true)^2)
+  mse_bf <- (colMeans(bf_chain) - post_mean_true)
+  mse_rwmh <- (colMeans(rwmh_chain) - post_mean_true)
+  mse_mh <- (colMeans(mh_chain) - post_mean_true)
   
   print(paste('Replication:', b))
   
