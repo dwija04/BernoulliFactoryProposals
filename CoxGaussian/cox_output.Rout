@@ -1,0 +1,338 @@
+
+R version 4.5.1 (2025-06-13) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> ##########################################
+> ## Code for reproducing the results from
+> ## the Cox processes example
+> ##########################################
+> library(mcmcse)
+> load("cox-data.RData")
+> load("output_Cox.RData")
+> 
+> 
+> ns <- xn[[1]]
+> xs <- xn[[2]] #generated data
+> m <- xn[[6]] #number of observations
+> t <- xn[[4]] #grid
+> n <- N
+> init <- xn[[10]]
+> 
+> reps <- length(output_cox)
+> 
+> 
+> #To store outputs
+> bf_loops_avg <- numeric(reps)
+> bf_loops_max <- numeric(reps)
+> bf_MultiESS <- numeric(reps)
+> bf_time <- numeric(reps)
+> bf_ess <- matrix(nrow = reps, ncol = m)
+> bf_ESJD <- numeric(reps)
+> bf_mse <- matrix(nrow = reps, ncol = m)
+> 
+> rwmh_MultiESS <- numeric(reps)
+> rwmh_time <- numeric(reps)
+> rwmh_ess <- matrix(nrow = reps, ncol = m)
+> rwmh_ESJD <- numeric(reps)
+> rwmh_mse <- matrix(nrow = reps, ncol = m)
+> 
+> mh_MultiESS <- numeric(reps)
+> mh_time <- numeric(reps)
+> mh_ess <- matrix(nrow = reps, ncol = m)
+> mh_ESJD <- numeric(reps)
+> mh_mse <- matrix(nrow = reps, ncol = m)
+> 
+> for(i in 1:reps)
++ {
++   foo <- output_cox[[i]]
++   
++   bf_time[i] <- foo[[1]]
++   rwmh_time[i] <- foo[[2]]
++   mh_time[i] <- foo[[3]]
++   
++   bf_loops_avg[i] <- foo[[4]]
++   bf_loops_max[i] <- foo[[5]]
++   
++   bf_MultiESS[i] <- foo[[6]]
++   rwmh_MultiESS[i] <- foo[[7]]
++   mh_MultiESS[i] <- foo[[8]]
++   
++   bf_ess[i, ] <- foo[[9]]
++   rwmh_ess[i, ] <- foo[[10]]
++   mh_ess[i, ] <- foo[[11]]
++   
++   bf_ESJD[i] <- foo[[12]]
++   rwmh_ESJD[i] <- foo[[13]]
++   mh_ESJD[i] <- foo[[14]]
++   
++   bf_mse[i, ] <- foo[[15]]
++   rwmh_mse[i, ] <- foo[[16]]
++   mh_mse[i, ] <- foo[[17]]
++ }
+> 
+> print(paste("Average number of mean loops: ", round(mean(bf_loops_avg), 4)))
+[1] "Average number of mean loops:  13.0741"
+> print(paste("Average number of max loops: ", round(mean(bf_loops_max), 4)))
+[1] "Average number of max loops:  1731.81"
+> 
+> bf_mESS_per_unit_time <- bf_MultiESS/bf_time
+> rwmh_mESS_per_unit_time <- rwmh_MultiESS/rwmh_time
+> mh_mESS_per_unit_time <- mh_MultiESS/mh_time
+> 
+> Multi_ESS_df <- data.frame(
++   Method = c("Bernoulli Factory", "Random Walk Metropolis Hastings", "Inexact Metropolis Hastings"),
++   MultiESS = c(round(mean(bf_MultiESS), 0), round(mean(rwmh_MultiESS), 0), round(mean(mh_MultiESS), 0)),
++   MultiESS_by_time = c(round(mean(bf_mESS_per_unit_time), 4), round(mean(rwmh_mESS_per_unit_time), 4), round(mean(mh_mESS_per_unit_time), 4)),
++   Avg_compute_time = c(round(mean(bf_time), 0), round(mean(rwmh_time), 0), round(mean(mh_time), 0))
++ )
+> 
+> print(Multi_ESS_df)
+                           Method MultiESS MultiESS_by_time Avg_compute_time
+1               Bernoulli Factory     1112           0.4127             2823
+2 Random Walk Metropolis Hastings      470           0.2677             1838
+3     Inexact Metropolis Hastings     1528           0.0705            21995
+> 
+> avg_ess_bf <- round(colMeans(bf_ess), 0)
+> avg_ess_rwmh <- round(colMeans(rwmh_ess), 0)
+> avg_ess_mh <- round(colMeans(mh_ess), 0)
+> 
+> ESS_df <- data.frame(
++   Method = c("Component 1", "Component 2", "Component 3", "Component 4", "Component 5", "Component 6", 
++              "Component 7", "Component 8", "Component 9", "Component 10"),
++   Bernoulli_ESS = avg_ess_bf,
++   RWMH_ESS = avg_ess_rwmh,
++   Inexact_MH_ESS = avg_ess_mh
++ )
+> 
+> print(ESS_df)
+          Method Bernoulli_ESS RWMH_ESS Inexact_MH_ESS
+1    Component 1           354      108            541
+2    Component 2           306      103            477
+3    Component 3           391      118            580
+4    Component 4           309       94            464
+5    Component 5           332      106            505
+6    Component 6           307       94            489
+7    Component 7           396      117            593
+8    Component 8           336      104            499
+9    Component 9           329      103            502
+10  Component 10           358      103            526
+11   Component 1           335      107            527
+12   Component 2           337      103            515
+13   Component 3           297       90            435
+14   Component 4           345      103            521
+15   Component 5           345      106            537
+16   Component 6           330      100            473
+17   Component 7           302       92            452
+18   Component 8           388      127            567
+19   Component 9           371      106            536
+20  Component 10           378      117            563
+21   Component 1           301       99            478
+22   Component 2           284       94            437
+23   Component 3           331      100            487
+24   Component 4           305       92            451
+25   Component 5           321      106            493
+26   Component 6           312       96            465
+27   Component 7           338       97            488
+28   Component 8           331       95            488
+29   Component 9           286       98            444
+30  Component 10           388      114            571
+31   Component 1           320      102            514
+32   Component 2           371      112            534
+33   Component 3           359      105            540
+34   Component 4           404      125            602
+35   Component 5           321       99            504
+36   Component 6           314       94            481
+37   Component 7           295       96            441
+38   Component 8           332      102            488
+39   Component 9           409      124            628
+40  Component 10           298      101            449
+41   Component 1           341      104            511
+42   Component 2           356      106            527
+43   Component 3           317       97            464
+44   Component 4           345      107            525
+45   Component 5           355      115            536
+46   Component 6           343      106            503
+47   Component 7           294      101            437
+48   Component 8           332      109            514
+49   Component 9           330      101            515
+50  Component 10           357      107            538
+51   Component 1           334      109            532
+52   Component 2           364      111            541
+53   Component 3           325      103            516
+54   Component 4           303       93            440
+55   Component 5           320       99            494
+56   Component 6           349      108            517
+57   Component 7           355      107            553
+58   Component 8           335      107            516
+59   Component 9           347      111            547
+60  Component 10           300       91            457
+61   Component 1           316       98            473
+62   Component 2           343      103            524
+63   Component 3           339      106            518
+64   Component 4           333      101            483
+65   Component 5           298       93            434
+66   Component 6           291       93            458
+67   Component 7           338      106            515
+68   Component 8           365      114            529
+69   Component 9           368      102            555
+70  Component 10           276       90            432
+71   Component 1           266       88            404
+72   Component 2           321      100            487
+73   Component 3           318      104            474
+74   Component 4           285      100            483
+75   Component 5           307       99            475
+76   Component 6           302      105            471
+77   Component 7           347      101            508
+78   Component 8           361      117            535
+79   Component 9           315       97            471
+80  Component 10           306       90            447
+81   Component 1           305       96            474
+82   Component 2           301       97            442
+83   Component 3           252       88            363
+84   Component 4           297       95            439
+85   Component 5           293      100            444
+86   Component 6           306       97            464
+87   Component 7           295      100            453
+88   Component 8           251       87            391
+89   Component 9           259      102            359
+90  Component 10           265       99            379
+91   Component 1           301      113            442
+92   Component 2           237       89            324
+93   Component 3           235       87            331
+94   Component 4           223       89            329
+95   Component 5           223       91            321
+96   Component 6           253       92            372
+97   Component 7           270      101            407
+98   Component 8           260       98            372
+99   Component 9           241       92            356
+100 Component 10           258       92            395
+> 
+> 
+> ESJD_df <- data.frame(
++   Method = c("Bernoulli Factory", "Random Walk Metropolis Hastings", "Inexact Metropolis Hastings"),
++   ESJD = c(round(mean(bf_ESJD), 4), round(mean(rwmh_ESJD), 4), round(mean(mh_ESJD), 4))
++ )
+> 
+> print(ESJD_df)
+                           Method   ESJD
+1               Bernoulli Factory 0.1888
+2 Random Walk Metropolis Hastings 0.0546
+3     Inexact Metropolis Hastings 0.2837
+> 
+> MSE_df <- data.frame(
++   Method = c("Bernoulli Factory", "Random Walk Metropolis Hastings", "Inexact Metropolis Hastings"),
++   MSE = c(round(norm(colMeans(bf_mse), "2"), 4), 
++     round(norm(colMeans(rwmh_mse), "2"), 4), 
++     round(norm(colMeans(mh_mse), "2"), 4))
++ )
+> 
+> print(MSE_df)
+                           Method    MSE
+1               Bernoulli Factory 0.0326
+2 Random Walk Metropolis Hastings 0.0515
+3     Inexact Metropolis Hastings 0.1068
+> 
+> ##########################################
+> # Single chain output (plots)
+> ##########################################
+> 
+> 
+> library(mcmcse)
+> source("cox_functions.R")
+> load("output_cox_single_run.RData")
+> load("output_cox_times.RData")
+> 
+> #PLOTS
+> delta_m <- 50/(m-1)
+> grid <- seq(0, 50, length = 100)
+> est_fun1 <- numeric(length = length(grid))
+> est_fun2 <- numeric(length = length(grid))
+> 
+> bf_samps <- bf_chain[[1]]
+> rwmh_samps <- rwmh_chain[[1]]
+> mh_samps <- mh_chain[[1]]
+> 
+> #log posterior
+> log_post_bf <- bf_chain[[4]]
+> log_post_rwmh <- rwmh_chain[[3]]
+> log_post_mh <- mh_chain[[3]]
+> 
+> ess_bf <- min(ess(bf_samps))
+> ess_rwmh <- min(ess(rwmh_samps))
+> ess_mh <- min(ess(mh_samps))
+> 
+> time_bf <- bf_time[3]
+> time_rwmh <- rwmh_time[3]
+> time_mh <- mh_time[3]
+> 
+> print(paste("Min ESS BF: ", ess_bf))
+[1] "Min ESS BF:  662.454061363381"
+> print(paste("Min ESS RWMH: ", ess_rwmh))
+[1] "Min ESS RWMH:  218.511229232142"
+> print(paste("Min ESS MH: ", ess_mh))
+[1] "Min ESS MH:  1153.06076122136"
+> 
+> ess_per_time_bf <- ess_bf/time_bf
+> ess_per_time_rwmh <- ess_rwmh/time_rwmh 
+> ess_per_time_mh <- ess_mh/time_mh
+> 
+> print(paste("ESS per unit time BF: ", round(ess_per_time_bf, 8)))
+[1] "ESS per unit time BF:  0.063146"
+> print(paste("ESS per unit time RWMH: ", round(ess_per_time_rwmh, 8)))
+[1] "ESS per unit time RWMH:  0.03879669"
+> print(paste("ESS per unit time MH: ", round(ess_per_time_mh, 8)))
+[1] "ESS per unit time MH:  0.01511014"
+> 
+> bern_loops_avg <- mean(bf_chain[[2]])
+> summary(bf_chain[[2]])
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   0.00    2.00    6.00   12.99   14.00 2270.00 
+> 
+> print(paste("Average number of mean loops BF: ", round(bern_loops_avg, 4)))
+[1] "Average number of mean loops BF:  12.9854"
+> 
+> #True density
+> temp <- seq(0, 50, length = 1e4)
+> y_temp <- (lam1(temp))
+> 
+> 
+> pdf("plots/cox-component-density.pdf", height = 4, width = 5)
+> j <- 10
+> plot(density(rwmh_samps[-c(1:1000), j]), col = "black", ylab = "Estimated Density", xlab = "x", main = "", lwd = 2)
+> lines(density(bf_samps[-c(1:1000), j]), col = "blue", lwd = 2)
+> lines(density(mh_samps[-c(1:1000), j]), col = "red", lwd = 2)
+> legend("topright", legend = c("Bernoulli Factory", "RWMH", "Inexact MH"), col = c("black", "blue", "red"), lwd = 2, cex = 0.8,  bty = "n")
+> dev.off()
+null device 
+          1 
+> 
+> 
+> pdf("plots/cox-component-density-100.pdf", height = 4, width = 5)
+> j <- 100
+> plot(density(rwmh_samps[-c(1:1000), j]), col = "black", ylab = "Estimated Density", xlab = "x", main = "", lwd = 2)
+> lines(density(bf_samps[-c(1:1000), j]), col = "blue", lwd = 2)
+> lines(density(mh_samps[-c(1:1000), j]), col = "red", lwd = 2)
+> legend("topright", legend = c("Bernoulli Factory", "RWMH", "Inexact MH"), col = c("black", "blue", "red"), lwd = 2,  bty = "n")
+> dev.off()
+null device 
+          1 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+ 24.534   4.863  30.746 

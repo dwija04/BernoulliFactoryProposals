@@ -24,19 +24,19 @@ bf_MultiESS <- numeric(reps)
 bf_time <- numeric(reps)
 bf_ess <- matrix(nrow = reps, ncol = m)
 bf_ESJD <- numeric(reps)
-bf_mse <- numeric(reps)
+bf_mse <- matrix(nrow = reps, ncol = m)
 
 rwmh_MultiESS <- numeric(reps)
 rwmh_time <- numeric(reps)
 rwmh_ess <- matrix(nrow = reps, ncol = m)
 rwmh_ESJD <- numeric(reps)
-rwmh_mse <- numeric(reps)
+rwmh_mse <- matrix(nrow = reps, ncol = m)
 
 mh_MultiESS <- numeric(reps)
 mh_time <- numeric(reps)
 mh_ess <- matrix(nrow = reps, ncol = m)
 mh_ESJD <- numeric(reps)
-mh_mse <- numeric(reps)
+mh_mse <- matrix(nrow = reps, ncol = m)
 
 for(i in 1:reps)
 {
@@ -61,9 +61,9 @@ for(i in 1:reps)
   rwmh_ESJD[i] <- foo[[13]]
   mh_ESJD[i] <- foo[[14]]
   
-  bf_mse[i] <- foo[[15]]
-  rwmh_mse[i] <- foo[[16]]
-  mh_mse[i] <- foo[[17]]
+  bf_mse[i, ] <- foo[[15]]
+  rwmh_mse[i, ] <- foo[[16]]
+  mh_mse[i, ] <- foo[[17]]
 }
 
 print(paste("Average number of mean loops: ", round(mean(bf_loops_avg), 4)))
@@ -106,8 +106,12 @@ print(ESJD_df)
 
 MSE_df <- data.frame(
   Method = c("Bernoulli Factory", "Random Walk Metropolis Hastings", "Inexact Metropolis Hastings"),
-  MSE = c(round(mean(bf_mse), 4), round(mean(rwmh_mse), 4), round(mean(mh_mse), 4))
+  MSE = c(round(norm(colMeans(bf_mse), "2"), 4), 
+    round(norm(colMeans(rwmh_mse), "2"), 4), 
+    round(norm(colMeans(mh_mse), "2"), 4))
 )
+
+print(MSE_df)
 
 ##########################################
 # Single chain output (plots)
