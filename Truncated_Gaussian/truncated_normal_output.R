@@ -64,7 +64,7 @@ x <- seq(0, 15, 0.01)
 plot(density(bf_chain[[1]]), ylim = c(0, .4), col = "blue", lwd = 2, main = " ", xlab = "x", ylab = "Estimated Density")
 lines(density(mh_chain[[1]]), col = "red", lwd = 2)
 lines(x, dgamma(x, shape = 2, rate = 1), col = "black", lwd = 2)
-legend("topright", legend = c("Target density", "Bernoulli factory MCMC", "Approximate Metropolis-Hastings") ,
+legend("topright", legend = c("Target density", "Bernoulli factory MCMC", "Inexact Metropolis-Hastings") ,
   col = c("black","blue","red"), lty = c(1, 1, 1), cex = 1, bty = "n", lwd = 2)
 dev.off()
 
@@ -75,7 +75,7 @@ bf_acf <- acf(bf_chain[[1]], lag.max = lag.max , plot = FALSE)$acf
 plot(0:lag.max , mh_acf, type = 'l', col = "red",
   ylab = "Estimated Autocorrelation Function", xlab = "Lags", lwd = 2)
 lines(0:lag.max , bf_acf, col = "blue", lwd = 2)
-legend("topright", legend = c("Bernoulli factory MCMC", "Approximate Metropolis-Hastings") ,
+legend("topright", legend = c("Bernoulli factory MCMC", "Inexact Metropolis-Hastings") ,
   col = c("blue","red"), lty = c(1, 1, 1),
   cex = 1, bty = "n", lwd =2)
 dev.off()
